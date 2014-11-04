@@ -358,6 +358,7 @@ ZW: "Zimbabwe"
 };
 
 function main(){
+    Meteor.subscribe("track");
     window.worldmap = getworldmap(); 
     Raphael(10, 10, 1000, 400, function () {
     var r = this;
@@ -440,4 +441,5 @@ function main(){
     };
   });
 }
+
 Meteor.startup(main);

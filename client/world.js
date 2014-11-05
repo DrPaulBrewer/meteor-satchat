@@ -357,8 +357,9 @@ ZW: "Zimbabwe"
 }}
 };
 
-function main(){
-    window.worldmap = getworldmap(); 
+function makeWorld(){
+    var world;
+    var worldmap = getworldmap(); 
     Raphael(10, 10, 1000, 400, 
     function () {
       var r = this;
@@ -380,7 +381,7 @@ function main(){
         // var c = Raphael.hsb(.11, .5, Math.random() * .25 - .25 + .75);
       r.path(worldmap.shapes[country]).attr({stroke: "#ccc6ae", fill: "#f0efeb", "stroke-  opacity": 0.25});
       }
-      var world = r.setFinish();
+      world = r.setFinish();  // define world in makeWorld() scope
       world.hover(over, out);
       // world.animate({fill: "#666", stroke: "#666"}, 2000);
       world.getXY = function (lat, lon) {
@@ -412,7 +413,7 @@ function main(){
       try {
         navigator.geolocation && navigator.geolocation.getCurrentPosition(
           function (pos) {
-          r.circle().attr({fill: "none", 
+            r.circle().attr({fill: "none", 
                            stroke: "#f00", 
                            r: 5})
                     .attr(world.getXY(pos.coords.latitude, pos.coords.longitude));
@@ -447,9 +448,18 @@ function main(){
       }
     };
   });
+  return world;
 }
 
 Meteor.startup(function(){
-  Meteor.subscribe("track");
-  main();
+  Meteor.subscribe("track", { 
+    onReady: function(){
+      satTrack = {};
+      var tracks = Track.find({}).fetch();
+      for(i=0,l=tracks.length; i<l; ++i){
+        satTrack[tracks[i].sat] = tracks[i];
+      }
+    }
+  });
+  world = makeWorld();
 });

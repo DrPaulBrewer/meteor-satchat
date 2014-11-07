@@ -358,108 +358,152 @@ ZW: "Zimbabwe"
 };
 
 function makeWorld(){
-    var world;
-    var worldmap = getworldmap(); 
-    Raphael(10, 10, 1000, 400, 
-    function () {
-      var r = this;
-      r.rect(0, 0, 1000, 400, 10).attr({
-        stroke: "none",
-        fill: "0-#9bb7cb-#adc8da"
-      });
-      var over = function () {
-        this.c = this.c || this.attr("fill");
-        this.stop().animate({fill: "#bacabd"}, 500);
-      }
-      var out = function () {
-          this.stop().animate({fill: this.c}, 500);
-      };
-      r.setStart();
-      var hue = Math.random();
-      for (var country in worldmap.shapes) {
-        // var c = Raphael.hsb(Math.random(), .5, .75);
-        // var c = Raphael.hsb(.11, .5, Math.random() * .25 - .25 + .75);
-      r.path(worldmap.shapes[country]).attr({stroke: "#ccc6ae", fill: "#f0efeb", "stroke-  opacity": 0.25});
-      }
-      world = r.setFinish();  // define world in makeWorld() scope
-      world.hover(over, out);
-      // world.animate({fill: "#666", stroke: "#666"}, 2000);
-      world.getXY = function (lat, lon) {
-        return {
-          cx: lon * 2.6938 + 465.4,
-          cy: lat * -2.6938 + 227.066
-        };
-      };
-      world.getLatLon = function (x, y) {
-        return {
-          lat: (y - 227.066) / -2.6938,
-          lon: (x - 465.4) / 2.6938
-        };
-      };
-      var latlonrg = /(\d+(?:\.\d+)?)[\xb0\s]?\s*(?:(\d+(?:\.\d+)?)['\u2019\u2032\s])?\s*(?:(\d+(?:\.\d+)?)["\u201d\u2033\s])?\s*([SNEW])?/i;
-      world.parseLatLon = function (latlon) {
-        var m = String(latlon).split(latlonrg),
-            lat = m && +m[1] + (m[2] || 0) / 60 + (m[3] || 0) / 3600;
-        if (m[4].toUpperCase() == "S") {
-          lat = -lat;
-        }
-        var lon = m && +m[6] + (m[7] || 0) / 60 + (m[8] || 0) / 3600;
-        if (m[9].toUpperCase() == "W") {
-          lon = -lon;
-        }
-        return this.getXY(lat, lon);
-      };
-
-      try {
-        navigator.geolocation && navigator.geolocation.getCurrentPosition(
-          function (pos) {
-            r.circle().attr({fill: "none", 
-                           stroke: "#f00", 
-                           r: 5})
-                    .attr(world.getXY(pos.coords.latitude, pos.coords.longitude));
-          });
-       } catch (e) {}
-      var frm = document.getElementById("latlon-form"),
-          dot = r.circle().attr({fill: "r#FE7727:50-#F57124:100", 
-                                 stroke: "#fff", 
-                                 "stroke-width": 2,
-                                 r: 0}),
-        // dot2 = r.circle().attr({stroke: "#000", r: 0}),
-          ll = document.getElementById("latlon"),
-          cities = document.getElementById("cities");
-      frm.onsubmit = function () {
-        var attr = world.parseLatLon(ll.value);
-        attr.r = 0;
-        dot.stop().attr(attr).animate({r: 5}, 1000, "elastic");
-        // dot2.stop().attr(attr).animate({r: 10}, 1000, "elastic");
-        return false;
-      };
-      cities.onclick = function (e) {
-        e = e || window.event;
-        var target = e.target || e.srcElement || document;
-        if (target.tagName == "A") {
-        var txt = decodeURIComponent(target.href.substring(target.href.indexOf("#") + 1)),
-            attr = world.parseLatLon(txt);
-        ll.value = txt;
-        attr.r = 0;
-        dot.stop().attr(attr).animate({r: 5}, 1000, "elastic");
-        // dot2.stop().attr(attr).animate({r: 10}, 1000, "elastic");
-        return false;
-      }
-    };
+  var worldmap = getworldmap(); 
+  var r = Raphael(10, 10, 1000, 400);
+  r.rect(0, 0, 1000, 400, 10).attr({
+    stroke: "none",
+    fill: "0-#9bb7cb-#adc8da"
   });
-  return world;
-}
+  var over = function () {
+    this.c = this.c || this.attr("fill");
+    this.stop().animate({fill: "#bacabd"}, 500);
+  }
+  var out = function () {
+    this.stop().animate({fill: this.c}, 500);
+  };
+  r.setStart(); // begin grouping for "world"
+  var hue = Math.random();
+  for (var country in worldmap.shapes) {
+    // var c = Raphael.hsb(Math.random(), .5, .75);
+    // var c = Raphael.hsb(.11, .5, Math.random() * .25 - .25 + .75);
+    r.path(worldmap.shapes[country]).attr({stroke: "#ccc6ae", fill: "#f0efeb", "stroke-  opacity": 0.25});
+  }
+  var world = r.setFinish();  // world encloses all from r.setStart()
+  world.hover(over, out);
+  // world.animate({fill: "#666", stroke: "#666"}, 2000);
+  world.getXY = function (lat, lon) {
+    return {
+      cx: lon * 2.6938 + 465.4,
+      cy: lat * -2.6938 + 227.066
+    };
+  };
+  world.getLatLon = function (x, y) {
+    return {
+      lat: (y - 227.066) / -2.6938,
+      lon: (x - 465.4) / 2.6938
+    };
+  };
+  var latlonrg = /(\d+(?:\.\d+)?)[\xb0\s]?\s*(?:(\d+(?:\.\d+)?)['\u2019\u2032\s])?\s*(?:(\d+(?:\.\d+)?)["\u201d\u2033\s])?\s*([SNEW])?/i;
+  world.parseLatLon = function (latlon) {
+    var m = String(latlon).split(latlonrg),
+        lat = m && +m[1] + (m[2] || 0) / 60 + (m[3] || 0) / 3600;
+    if (m[4].toUpperCase() == "S") {
+      lat = -lat;
+    }
+    var lon = m && +m[6] + (m[7] || 0) / 60 + (m[8] || 0) / 3600;
+    if (m[9].toUpperCase() == "W") {
+      lon = -lon;
+    }
+    return this.getXY(lat, lon);
+  };
 
-Meteor.startup(function(){
-  Meteor.subscribe("track", { 
-    onReady: function(){
-      satTrack = {};
-      var tracks = Track.find({}).fetch();
-      for(i=0,l=tracks.length; i<l; ++i){
-        satTrack[tracks[i].sat] = tracks[i];
-      }
+  try {
+    navigator.geolocation && navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        r.circle().attr({fill: "none", 
+                         stroke: "#f00", 
+                         r: 5})
+        .attr(world.getXY(pos.coords.latitude, pos.coords.longitude));
+      });
+  } catch (e) {}
+  var dot = r.circle().attr({fill: "r#FE7727:50-#F57124:100", 
+                             stroke: "#fff", 
+                             "stroke-width": 2,
+                             r: 0});
+  $('#latlon-form').submit(function () {
+    var attr = world.parseLatLon($('#latlon'));
+    attr.r = 0;
+    dot.stop().attr(attr).animate({r: 5}, 1000, "elastic");
+    // dot2.stop().attr(attr).animate({r: 10}, 1000, "elastic");
+    return false;
+  });
+  $('#cities').click(function (e) {
+    e = e || window.event;
+    var target = e.target || e.srcElement || document;
+    if (target.tagName == "A") {
+      var txt = decodeURIComponent(target.href.substring(target.href.indexOf("#") + 1)),
+          attr = world.parseLatLon(txt);
+      $('#latlon').val(txt);
+      attr.r = 0;
+      dot.stop().attr(attr).animate({r: 5}, 1000, "elastic");
+      // dot2.stop().attr(attr).animate({r: 10}, 1000, "elastic");
+      return false;
     }
   });
-  world = makeWorld();
+  return {
+    'r': r,
+    'world': world,
+    'worldmap': worldmap,
+    'over': over,
+    'out': out,
+    'dot': dot
+  }
+};
+  
+Meteor.startup(function(){
+  app = makeWorld();
+  Meteor.subscribe("track");
+  satTrack = {};
+  var TrackUpdater = function(){
+    Tracker.autorun(function(){
+        console.log("fetching Tracks");
+        var now = Math.floor((+new Date()/1000.0));
+        var tracks = Track.find({'end': {$gt: now}}).fetch();
+        for(i=0,l=tracks.length; i<l; ++i){
+          if ((typeof satTrack[tracks[i].sat] === "undefined") || 
+              (tracks[i].end>satTrack[tracks[i].sat].end) ){
+            satTrack[tracks[i].sat] = tracks[i];
+          }
+        }
+     });    
+  };
+  setTimeout(TrackUpdater, 3000);
+  satPos = function(sat){
+    var s = satTrack[sat];
+    var time = (+new Date())/1000;
+    var idx = Math.floor((time-s.start)/s.delta);
+    var q1 = ((time - s.start)%s.delta)/s.delta;
+    var q0 = 1.0 - q1;
+    var pos0 = s.latlon[idx];
+    var pos1 = s.latlon[idx+1];
+    var pos = [];
+    pos[0] = pos0[0]*q0+pos1[0]*q1;
+    pos[1] = pos0[1]*q0+pos1[1]*q1;
+    return pos; // returns a 2 element array lat, -long
+  };
+  satPosXY = function(sat){
+    var pos = satPos(sat);
+    return app.world.getXY(pos[0],-pos[1]); // -pos[1] because predict uses +long for West, - for east
+    // returns an object with cx, cy attributes, ready to use in RaphaelJS circle.attr() function
+  }
+  satAnimation = function(){
+    var sats = Object.keys(satTrack);
+    var fills = ['#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fff','#800','#080','#008'];
+    var balls = [];
+    var coords;
+    for(i=0,l=sats.length;i<l;++i){
+      app.r.setStart();
+      app.r.circle(0,0,5).attr("fill",fills[i]);
+      app.r.text(0,10, sats[i]);
+      balls[i] = app.r.setFinish();
+    }
+    var animationStep = function(){
+      for(i=0,l=sats.length;i<l;++i){
+        var coords = satPosXY(sats[i]);
+        balls[i].transform("T"+coords.cx+","+coords.cy);
+      }
+    }
+    setInterval(animationStep, 1000);
+  }
+  setTimeout(satAnimation, 4000); 
 });

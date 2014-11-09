@@ -1,1 +1,13 @@
 /* CSS declarations go here */
+#worldMap {
+  position: absolute;
+  width: 600px;
+  height: 320px;
+}
+#chatApp {
+  position: absolute;
+  top: 320px;
+  left: 0px;
+  width: 600px;
+  height: 200px;
+}

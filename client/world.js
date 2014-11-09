@@ -6,7 +6,7 @@
 
 
 function makeWorld(){
-  var r = Raphael(0, 0, 1000, 400);
+  var r = Raphael(0, 0, 600, 330);
   r.rect(0, 0, 1000, 400, 10).attr({
     stroke: "none",
 //    fill: "0-#9bb7cb-#adc8da"
@@ -78,8 +78,8 @@ Meteor.startup(function(){
     // returns an object with cx, cy attributes, ready to use in RaphaelJS circle.attr() function
   }
   satAnimation = function(){
-    function lx(i){ return 20+(i%3)*100; }
-    function ly(i){ return 300+20*Math.floor(i/3);}
+    function lx(i){ return 20+(i%5)*100; }
+    function ly(i){ return 300+20*Math.floor(i/5);}
     var sats = Object.keys(satTrack);
     var fills = ['#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fff','#800','#080','#008'];
     var balls = [];
@@ -99,5 +99,13 @@ Meteor.startup(function(){
     }
     setInterval(animationStep, 1000);
   }
+  UTC = function(){
+    $('#timeUTC').text(new Date().toUTCString());
+  };
+  UTC();
+  setInterval(UTC, 1000);
+  $('#signin').click(function(){
+    $('#register').hide();
+  });
   setTimeout(satAnimation, 4000); 
 });

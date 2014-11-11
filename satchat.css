@@ -11,3 +11,8 @@
   width: 600px;
   height: 200px;
 }
+#mainRoomMessages {
+  overflow-y: auto;
+  max-width: 600px;
+  max-height: 150px;
+}

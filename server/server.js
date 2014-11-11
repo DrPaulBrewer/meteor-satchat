@@ -1,5 +1,7 @@
 // server.js
 Meteor.startup(function(){
+  Track = new Mongo.Collection("track");
+  Messages = new Mongo.Collection("messages");
   Meteor.publish("track", function(){ 
     return Track.find(); 
   });

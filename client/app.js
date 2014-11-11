@@ -3,53 +3,57 @@
 // Paul Brewer 8 Nov 2014 
 // 
 //
-
-// let all Meteor templates access Session via session "quotedvarname"
-// see @jtblin Stack Overflow answer http://stackoverflow.com/a/13105238/103081
-
-Handlebars.registerHelper('session',function(input){
-    return Session.get(input);
-});
-
-function makeWorld(){
-  var r = Raphael(0, 0, 600, 330);
-  r.rect(0, 0, 1000, 400, 10).attr({
-    stroke: "none",
-//    fill: "0-#9bb7cb-#adc8da"
-    fill: "#fff"
-  });
-  world = r.image("/nasa-world-dec.jpg",0,0,600,300);
-  world.getXY = function (lat, lon) {
-    return {
-      cx: lon * (300.0/180.0) + 300.0,
-      cy: lat * (-150.0/90.0) + 150.0
-    };
-  };
-  world.getLatLon = function (x, y) {
-    return {
-      lat: (y - 150.0) / -(90.0/150.0),
-      lon: (x - 300.0) / (180.0/300.0)
-    };
-  };
-
-  try {
-    navigator.geolocation && navigator.geolocation.getCurrentPosition(
-      function (pos) {
-        c = world.getXY(pos.coords.latitude, pos.coords.longitude);
-        r.rect(c.cx-2,c.cy-2,4,4).attr({fill: "none", 
-                         stroke: "#f00"});
-      });
-  } catch (e) {}
-
-  return {
-    'r': r,
-    'world': world
-  }
-};
-  
 Meteor.startup(function(){
-  app = makeWorld();
+  Track = new Mongo.Collection("track");
+  Messages = new Mongo.Collection("messages");
   Meteor.subscribe("track");
+  Meteor.subscribe("messages");
+  Template.room.helpers({
+    msgs: function(){ 
+      console.log('messages helper firing');
+      // return Messages.find({}, {sort: {'t': 1}});
+      return Messages.find({});
+    }
+  });
+  
+  makeWorld = function (){
+    var r = Raphael(0, 0, 600, 330);
+    r.rect(0, 0, 1000, 400, 10).attr({
+      stroke: "none",
+  //    fill: "0-#9bb7cb-#adc8da"
+      fill: "#fff"
+    });
+    world = r.image("/nasa-world-dec.jpg",0,0,600,300);
+    world.getXY = function (lat, lon) {
+      return {
+        cx: lon * (300.0/180.0) + 300.0,
+        cy: lat * (-150.0/90.0) + 150.0
+      };
+    };
+    world.getLatLon = function (x, y) {
+      return {
+        lat: (y - 150.0) / -(90.0/150.0),
+        lon: (x - 300.0) / (180.0/300.0)
+      };
+    };
+
+    try {
+      navigator.geolocation && navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          c = world.getXY(pos.coords.latitude, pos.coords.longitude);
+          r.rect(c.cx-2,c.cy-2,4,4).attr({fill: "none", 
+                           stroke: "#f00"});
+        });
+    } catch (e) {}
+
+    return {
+      'r': r,
+      'world': world
+    }
+  };
+  
+
+  app = makeWorld();
   satTrack = {};
   var TrackUpdater = function(){
     Tracker.autorun(function(){
@@ -65,6 +69,25 @@ Meteor.startup(function(){
      });    
   };
   setTimeout(TrackUpdater, 3000);
+  var utcHMS = function(t){
+    d = new Date(t);
+    return d.getUTCHours()+':'+d.getUTCMinutes();
+  }
+  var MessageUpdater = function(){
+    Tracker.autorun(function(){
+      console.log("fetching Messages");
+      var msgs = Messages.find({}).fetch();
+      console.log(msgs.length);
+      var chat = msgs.map(function(m){
+        return m.call+'@'+utcHMS(m.t)+': '+m.txt;
+      }).join("<br/>");
+      $('#mainRoomMessages').html(chat);
+      var chatDiv = $('#mainRoomMessages');
+      chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
+      // see http://stackoverflow.com/a/11551414/103081 for scoll to bottom
+    });
+  };
+  setTimeout(MessageUpdater, 2000);
   satPos = function(sat){
     var s = satTrack[sat];
     var time = (+new Date())/1000;
@@ -96,14 +119,14 @@ Meteor.startup(function(){
       app.r.text(50,0, sats[i]);
       app.r.setFinish().transform("T"+lx(i)+","+ly(i));
       balls[i] = app.r.circle(0,0,5)
-                    .attr("fill",fills[i])
-                    .hover(
-                      function(){
-                        console.log(this);
-                    },
-                      function(){
-                        console.log(this);
-                    });
+                    .attr("fill",fills[i]);
+      //              .hover(
+      //                function(){
+      //                  console.log(this);
+      //              },
+      //                function(){
+      //                  console.log(this);
+      //              });
     }
     var animationStep = function(){
       for(i=0,l=sats.length;i<l;++i){
@@ -118,29 +141,20 @@ Meteor.startup(function(){
   };
   UTC();
   setInterval(UTC, 1000);
-  Template.room.helpers({
-    'messages': function(){ 
-      console.log('messages helper firing');
-      return Messages.find({}, {sort: {'t': 1}});
-    }
-  });
-  Template.world.events({
-    'click .signin': function(event){
+  $(function(){
+    $('.signin').click(function(event){
       console.log('click #signin');
-      Session.set('mycall', $('#myCall').val());
-      Meteor.call('chatRegister', Session.get('mycall'));
+      Meteor.call('chatRegister', $('#myCall').val());
       $('#register').hide();
-      Meteor.subscribe("messages");      
-    }    
-  });
-  Template.room.events({
-    'click .send': function(event){
+    });
+    $('.send').click(function(event){
       console.log('#send clicked');
+      console.log($('#compose').val().length);
       if ($('#compose').val().length>2){
         console.log('if true');
         $('#send').prop('disabled', true);
         console.log('before call');
-        Meteor.call('sendMessage', Session.get('mycall'), $('#compose').val());
+        Meteor.call('sendMessage', $('#myCall').val(), $('#compose').val());
         console.log('after call');
         $('#compose').val('');
         console.log('after clear');
@@ -149,8 +163,8 @@ Meteor.startup(function(){
           $('#send').prop('disabled', false);
           console.log('reenabled #send');
         }, 1000);      
-      }
-    }
+      }    
+    });
   });
   setTimeout(satAnimation, 4000); 
 });

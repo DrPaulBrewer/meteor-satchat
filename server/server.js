@@ -4,10 +4,17 @@ Meteor.startup(function(){
     return Track.find(); 
   });
   Meteor.publish("messages", function(){
-    return messages.find();
+    return Messages.find();
   });
+  var sendMessage = function(call, txt){
+    Messages.insert({'call': call, 'txt': txt, 't': +new Date()});
+    return true;
+  };
   Meteor.methods({
-    'sendMessage':function(key, room, msg){
-    }
+    'chatRegister': function(mycall){
+      sendMessage(mycall, 'sign on');
+      return true;
+    },
+    'sendMessage': sendMessage
   });
 });

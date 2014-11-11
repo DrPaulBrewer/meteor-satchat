@@ -1,0 +1,11 @@
+<template name="room">
+  <div id="mainRoom">
+     <div id="mainRoomMessages">
+       {{#each messages}}
+         {{call}}@{{t}}:{{txt}}<br /> 
+       {{/each}}
+     </div>
+     <textarea id="compose" cols=80 rows=3></textarea>
+     <br /><button class="send">send</button>
+   </div>
+</template>

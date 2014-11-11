@@ -4,6 +4,12 @@
 // 
 //
 
+// let all Meteor templates access Session via session "quotedvarname"
+// see @jtblin Stack Overflow answer http://stackoverflow.com/a/13105238/103081
+
+Handlebars.registerHelper('session',function(input){
+    return Session.get(input);
+});
 
 function makeWorld(){
   var r = Raphael(0, 0, 600, 330);
@@ -89,7 +95,15 @@ Meteor.startup(function(){
       app.r.circle(0,0,3).attr("fill",fills[i]);
       app.r.text(50,0, sats[i]);
       app.r.setFinish().transform("T"+lx(i)+","+ly(i));
-      balls[i] = app.r.circle(0,0,5).attr("fill",fills[i]);
+      balls[i] = app.r.circle(0,0,5)
+                    .attr("fill",fills[i])
+                    .hover(
+                      function(){
+                        console.log(this);
+                    },
+                      function(){
+                        console.log(this);
+                    });
     }
     var animationStep = function(){
       for(i=0,l=sats.length;i<l;++i){
@@ -104,8 +118,39 @@ Meteor.startup(function(){
   };
   UTC();
   setInterval(UTC, 1000);
-  $('#signin').click(function(){
-    $('#register').hide();
+  Template.room.helpers({
+    'messages': function(){ 
+      console.log('messages helper firing');
+      return Messages.find({}, {sort: {'t': 1}});
+    }
+  });
+  Template.world.events({
+    'click .signin': function(event){
+      console.log('click #signin');
+      Session.set('mycall', $('#myCall').val());
+      Meteor.call('chatRegister', Session.get('mycall'));
+      $('#register').hide();
+      Meteor.subscribe("messages");      
+    }    
+  });
+  Template.room.events({
+    'click .send': function(event){
+      console.log('#send clicked');
+      if ($('#compose').val().length>2){
+        console.log('if true');
+        $('#send').prop('disabled', true);
+        console.log('before call');
+        Meteor.call('sendMessage', Session.get('mycall'), $('#compose').val());
+        console.log('after call');
+        $('#compose').val('');
+        console.log('after clear');
+        setTimeout(function(){
+          console.log('about to re-enable #send');
+          $('#send').prop('disabled', false);
+          console.log('reenabled #send');
+        }, 1000);      
+      }
+    }
   });
   setTimeout(satAnimation, 4000); 
 });

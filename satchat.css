@@ -11,8 +11,24 @@
   width: 600px;
   height: 200px;
 }
+div.room{
+  width: 600px;
+  height: 220px;
+}
 #mainRoomMessages {
   overflow-y: auto;
   max-width: 600px;
   max-height: 150px;
+}
+span.signinWarning {
+  color: red;
+}
+#compose {
+  width: 540px;
+  height: 60px;
+}
+button.send {
+  float: right;
+  width: 50px;
+  height: 60px;
 }

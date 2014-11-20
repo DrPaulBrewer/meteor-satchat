@@ -1,4 +1,16 @@
-// This world.js began as a modification of Baranovskiy's demo used on the Raphael js library site
+// satchat Copyright 2014 
+// Paul Brewer KI6CQ - Economic and Financial Technology Consulting LLC - www.eaftc.com
+//
+// <your name could be here too> if you contribute code features or patches we use
+//
+// Open Source License: MIT License -- see http://opensource.org/licenses/MIT
+// 
+// satchat is a MeteorJS based chat room that also displays satellite tracking data
+//
+// The chats and about 24hrs of 1 minute satellite tracking data are kept in a MongoDB database
+// Calculations for tracking must be supplied to the database externally
+//
+// This file: world.js began as a modification of Baranovskiy's demo used on the Raphael js library website
 // As of Nov.8, most of the demo code is gone and this is mostly sat display code
 // Paul Brewer 8 Nov 2014 
 // 
@@ -39,16 +51,12 @@ registerHelpers({
 
 Template.room.helpers({
   msgs: function(){ 
-    console.log('messages helper firing');
-    // return Messages.find({}, {sort: {'t': 1}});
     return Messages.find({});
   }
 });
 
 Template.world.events({
   'click .signin': function(event, template){
-      console.log('click #signin');
-      console.log('at signin qthxy = '+JSON.stringify(qthxy))
       var call = $('#myCall').val();
       if ((typeof(call)==="string") && (call.length>2)){
         call = call.toUpperCase();
@@ -63,20 +71,12 @@ Template.world.events({
 
 Template.room.events({
   'click .send': function(){
-    console.log('#send clicked');
-    console.log($('#compose').val().length);
     if ($('#compose').val().length>2){
-      console.log('if true');
       $('#send').prop('disabled', true);
-      console.log('before call');
       Meteor.call('sendMessage', $('#myCall').val(), $('#compose').val() );
-      console.log('after call');
       $('#compose').val('');
-      console.log('after clear');
       setTimeout(function(){
-        console.log('about to re-enable #send');
         $('#send').prop('disabled', false);
-        console.log('reenabled #send');
       }, 1000);      
     }
   }
@@ -120,12 +120,13 @@ satTrack = {};
 
 var TrackUpdater = function(){
   Tracker.autorun(function(){
-    console.log("fetching Tracks");
+    console.log("fetching satellite tracks");
     var now = Math.floor((+new Date()/1000.0));
     var tracks = Track.find({'end': {$gt: now}}).fetch();
     for(i=0,l=tracks.length; i<l; ++i){
       if ((typeof satTrack[tracks[i].sat] === "undefined") || 
           (tracks[i].end>satTrack[tracks[i].sat].end) ){
+        console.log("found: "+tracks[i].sat+" --> "+shortName(tracks[i].sat));
         satTrack[tracks[i].sat] = tracks[i];
       }
     }
@@ -157,17 +158,14 @@ var QTHUpdater = function(r){
     }
     green = 255-red;
     color =  'rgb('+red+', '+green+', 0)';
-    console.log('ageColor '+color);
     return color;
   }
   Tracker.autorun(function(){
-    console.log("updating roster");
     var updates = QTH.find({'t': {$gt: stamp}},{$sort:{'t':1}}).fetch();
     var myCall = $('#myCall').val();
     var myColor = 'aqua';
     stamp = +new Date();
     for(var i=0,l=updates.length; i<l; ++i) (function(i){
-      console.log(updates[i].call);
       var cx = updates[i].qthxy.cx;
       var cy = updates[i].qthxy.cy;
       var t = updates[i].t;
@@ -270,13 +268,7 @@ Meteor.startup(function(){
       if (sats[i]==="ISS"){
         balls[i] = drawISS();
       } else {
-        balls[i] = drawSat(shortName(sats[i]), fills[i])
-         .hover(function(){
-                    console.log(this);
-         },
-        function(){
-             console.log(this);
-        });
+        balls[i] = drawSat(shortName(sats[i]), fills[i]);
       }
     }
     var animationStep = function(){
@@ -293,9 +285,7 @@ Meteor.startup(function(){
   UTC();
   setInterval(UTC, 1000);
   Tracker.autorun(function(){
-    console.log("fetching Messages");
     var msgs = Messages.find({}).fetch();
-    console.log(msgs.length);
     var chat = msgs.map(function(m){
       return m.call+'@'+utcHMS(m.t)+': '+m.txt;
     }).join("<br/>");

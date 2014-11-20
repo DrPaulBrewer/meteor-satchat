@@ -236,16 +236,18 @@ Meteor.startup(function(){
   }
   drawISS = function(){
     app.r.setStart();
-    app.r.rect(-10,-10,2,20).attr("fill","#ff0");
-    app.r.rect(10,-10,2,20).attr("fill","#00f");
-    app.r.text(1,0,"ISS").attr("fill","#999");
+    app.r.rect(-12,-10,3,20).attr("fill","#ff0");
+    app.r.rect(12,-10,3,20).attr("fill","#00f");
+    app.r.rect(-7,-5,14,10).attr("fill","#000");
+    app.r.text(1,0,"ISS").attr("fill","#bbb");
     return app.r.setFinish();
   };
   drawSat = function(name, color){
     app.r.setStart();
     app.r.circle(0,0,5).attr("fill", color);
+    app.r.rect(-15,5,30,10).attr("fill","#000");
     app.r.text(0,10,name).attr("fill", color);
-    return app.r.setFinish();
+    return app.r.setFinish().transform("S1.5");
   };
   shortNames = {
     'NOAA-15': 'N15',
@@ -260,24 +262,14 @@ Meteor.startup(function(){
     return shortNames[predictName] || predictName;    
   }
   satAnimation = function(){
-    // legend position functions in Antarctica
-    // function lx(i){ return 20+(i%5)*100; }
-    // function ly(i){ return 300+20*Math.floor(i/5);}
     var sats = Object.keys(satTrack);
     var fills = ['#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fff','#800','#080','#008'];
     var balls = [];
     var coords;
     for(i=0,l=sats.length;i<l;++i){
       if (sats[i]==="ISS"){
-//        legend for ISS
-//        drawISS().transform("T"+lx(i)+","+ly(i));
         balls[i] = drawISS();
       } else {
-// legend for sats
-//        app.r.setStart();
-//        app.r.circle(0,0,3).attr("fill",fills[i]);
-//        app.r.text(50,0, sats[i]);
-//        app.r.setFinish().transform("T"+lx(i)+","+ly(i));
         balls[i] = drawSat(shortName(sats[i]), fills[i])
          .hover(function(){
                     console.log(this);
@@ -310,7 +302,7 @@ Meteor.startup(function(){
     $('#mainRoomMessages').html(chat);
     var chatDiv = $('#mainRoomMessages');
     chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
-    // see http://stackoverflow.com/a/11551414/103081 for scoll to bottom
+    // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
   });
   
   setTimeout(QTHUpdater.bind({}, app.r), 3000);

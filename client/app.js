@@ -260,17 +260,20 @@ Meteor.startup(function(){
     return shortNames[predictName] || predictName;    
   }
   satAnimation = function(){
-    function lx(i){ return 20+(i%5)*100; }
-    function ly(i){ return 300+20*Math.floor(i/5);}
+    // legend position functions in Antarctica
+    // function lx(i){ return 20+(i%5)*100; }
+    // function ly(i){ return 300+20*Math.floor(i/5);}
     var sats = Object.keys(satTrack);
     var fills = ['#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fff','#800','#080','#008'];
     var balls = [];
     var coords;
     for(i=0,l=sats.length;i<l;++i){
       if (sats[i]==="ISS"){
+//        legend for ISS
 //        drawISS().transform("T"+lx(i)+","+ly(i));
         balls[i] = drawISS();
       } else {
+// legend for sats
 //        app.r.setStart();
 //        app.r.circle(0,0,3).attr("fill",fills[i]);
 //        app.r.text(50,0, sats[i]);

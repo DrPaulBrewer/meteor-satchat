@@ -80,7 +80,9 @@ Template.room.events({
       }, 1000);      
     }
   }
-});  
+}); 
+
+
 makeWorld = function (){
   var r = Raphael(0, 0, 600, 330);
   r.rect(0, 0, 1000, 400, 10).attr({
@@ -161,17 +163,16 @@ var QTHUpdater = function(r){
   Tracker.autorun(function(){
     console.log("updating roster");
     var updates = QTH.find({'t': {$gt: stamp}},{$sort:{'t':1}}).fetch();
-    var cx,cy,t;
-    var call;
     var myCall = $('#myCall').val();
     var myColor = 'aqua';
     stamp = +new Date();
-    for(var i=0,l=updates.length; i<l; ++i){
+    for(var i=0,l=updates.length; i<l; ++i) (function(i){
       console.log(updates[i].call);
-      cx = updates[i].qthxy.cx;
-      cy = updates[i].qthxy.cy;
-      t = updates[i].t;
-      call = updates[i].call;
+      var cx = updates[i].qthxy.cx;
+      var cy = updates[i].qthxy.cy;
+      var t = updates[i].t;
+      var call = updates[i].call;
+      var color = 0;
       if (r.roll[call]){
         color = (call===myCall)? myColor: ageColor(t);
         r.roll.marker.attr({fill: color});
@@ -188,7 +189,7 @@ var QTHUpdater = function(r){
           .hover(function(){r.roll[call].popup.toFront().show()},
              function(){});
       }
-    }   
+    })(i);
   });
 };
 
@@ -216,7 +217,12 @@ satPos = function(sat){
   var pos1 = s.latlon[idx+1];
   var pos = [];
   pos[0] = pos0[0]*q0+pos1[0]*q1;
-  pos[1] = pos0[1]*q0+pos1[1]*q1;
+  if (Math.abs(pos0[1]-pos1[1])<170){
+    pos[1] = pos0[1]*q0+pos1[1]*q1;    
+  } else { 
+    pos[1] = -179.99;  // just stick it on the eastern edge for now
+  }
+
   return pos; // returns a 2 element array lat, -long
 };
 

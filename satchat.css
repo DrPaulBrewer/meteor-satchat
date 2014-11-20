@@ -1,24 +1,28 @@
 /* CSS declarations go here */
 #worldMap {
+  display: block;
   position: absolute;
   width: 600px;
-  height: 320px;
+  height: 300px;
 }
 #chatApp {
+  display: block;
   position: absolute;
-  top: 320px;
+  top: 290px;
   left: 0px;
   width: 600px;
-  height: 200px;
+  height: 250px;
 }
 div.room{
   width: 600px;
-  height: 220px;
+  height: 250px;
 }
 #mainRoomMessages {
+  margin-top: -10px;
+  display: block;
   overflow-y: auto;
   max-width: 600px;
-  max-height: 150px;
+  max-height: 220px;
 }
 span.signinWarning {
   color: red;

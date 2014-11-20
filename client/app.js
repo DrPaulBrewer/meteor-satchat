@@ -84,7 +84,7 @@ Template.room.events({
 
 
 makeWorld = function (){
-  var r = Raphael(0, 0, 600, 330);
+  var r = Raphael(0, 0, 600, 300);
   r.rect(0, 0, 1000, 400, 10).attr({
     stroke: "none",
     fill: "#fff"
@@ -234,6 +234,31 @@ Meteor.startup(function(){
     return app.world.getXY(pos[0],-pos[1]); // -pos[1] because predict uses +long for West, - for east
     // returns an object with cx, cy attributes, ready to use in RaphaelJS circle.attr() function
   }
+  drawISS = function(){
+    app.r.setStart();
+    app.r.rect(-10,-10,2,20).attr("fill","#ff0");
+    app.r.rect(10,-10,2,20).attr("fill","#00f");
+    app.r.text(1,0,"ISS").attr("fill","#999");
+    return app.r.setFinish();
+  };
+  drawSat = function(name, color){
+    app.r.setStart();
+    app.r.circle(0,0,5).attr("fill", color);
+    app.r.text(0,10,name).attr("fill", color);
+    return app.r.setFinish();
+  };
+  shortNames = {
+    'NOAA-15': 'N15',
+    'NOAA-18': 'N18',
+    'NOAA-19': 'N19',
+    'OSCAR-7': 'AO7',
+    'OSCAR-29': 'FO29',
+    'OSCAR-50': 'SO50',
+    'FUNCUBE-1': 'AO73'
+  };
+  shortName = function(predictName){
+    return shortNames[predictName] || predictName;    
+  }
   satAnimation = function(){
     function lx(i){ return 20+(i%5)*100; }
     function ly(i){ return 300+20*Math.floor(i/5);}
@@ -242,18 +267,22 @@ Meteor.startup(function(){
     var balls = [];
     var coords;
     for(i=0,l=sats.length;i<l;++i){
-      app.r.setStart();
-      app.r.circle(0,0,3).attr("fill",fills[i]);
-      app.r.text(50,0, sats[i]);
-      app.r.setFinish().transform("T"+lx(i)+","+ly(i));
-      balls[i] = app.r.circle(0,0,5)
-      .attr("fill",fills[i])
-       .hover(function(){
-                  console.log(this);
-       },
-      function(){
-           console.log(this);
-      });
+      if (sats[i]==="ISS"){
+//        drawISS().transform("T"+lx(i)+","+ly(i));
+        balls[i] = drawISS();
+      } else {
+//        app.r.setStart();
+//        app.r.circle(0,0,3).attr("fill",fills[i]);
+//        app.r.text(50,0, sats[i]);
+//        app.r.setFinish().transform("T"+lx(i)+","+ly(i));
+        balls[i] = drawSat(shortName(sats[i]), fills[i])
+         .hover(function(){
+                    console.log(this);
+         },
+        function(){
+             console.log(this);
+        });
+      }
     }
     var animationStep = function(){
       for(i=0,l=sats.length;i<l;++i){

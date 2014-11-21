@@ -288,8 +288,9 @@ Meteor.startup(function(){
     var msgs = Messages.find({}).fetch();
     var chat = msgs.map(function(m){
       return m.call+'@'+utcHMS(m.t)+': '+m.txt;
-    }).join("<br/>");
-    $('#mainRoomMessages').html(chat);
+    }).join("\n");
+    var fix = $('#mainRoomMessages').text(chat);
+    fix.html(fix.html().replace(/\n/g,'<br/>'));
     var chatDiv = $('#mainRoomMessages');
     chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
     // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom

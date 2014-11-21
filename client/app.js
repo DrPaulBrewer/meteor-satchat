@@ -22,6 +22,14 @@ QTH = new Mongo.Collection("qth");
 Meteor.subscribe("track");
 Meteor.subscribe("messages");
 Meteor.subscribe("qth");
+Meteor.subscribe("userPresence");
+
+Presence.state = function() {
+  return {
+    callsign: Session.get('callsign')
+  };
+};
+
 qthxy = {};
 
 var registerHelpers = function(obj){
@@ -61,6 +69,7 @@ Template.world.events({
       if ((typeof(call)==="string") && (call.length>2)){
         call = call.toUpperCase();
         $('#myCall').val(call);
+        Session.set('callsign',$('#myCall').val());
         Meteor.call('chatRegister', $('#myCall').val(), qthxy);
         $('#register').hide();
         $('.signinWarning').hide();

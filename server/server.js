@@ -12,6 +12,22 @@ Meteor.startup(function(){
   Meteor.publish("qth", function(){
     return QTH.find();
   });
+  Meteor.publish('userPresence', function() {
+  // requires meteor add tmeasday:presence
+  // Setup some filter to find the users your user
+  // cares about. It's unlikely that you want to publish the 
+  // presences of _all_ the users in the system.
+
+  // If for example we wanted to publish only logged in users we could apply:
+  // filter = { userId: { $exists: true }};
+  
+  var filter = { userId: { $exists: true }}; 
+
+    return Presences.find(filter, { fields: { state: true, userId: true }});
+    
+  });
+  
+  
   var sendMessage = function(call, txt){
     Messages.insert({'call': call, 'txt': txt, 't': +new Date()});
     return true;

@@ -294,6 +294,7 @@ Meteor.startup(function(){
     var chatDiv = $('#mainRoomMessages');
     chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
     // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
+    // see http://stackoverflow.com/a/13082028/103081 for newlines to br
   });
   
   setTimeout(QTHUpdater.bind({}, app.r), 3000);

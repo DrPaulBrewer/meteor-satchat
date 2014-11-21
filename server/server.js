@@ -12,6 +12,11 @@ Meteor.startup(function(){
   Meteor.publish("qth", function(){
     return QTH.find();
   });
+  
+  Meteor.publish("users", function(){
+    return Users.find({},{fields: {_id:true, username: true}})
+  });
+  
   Meteor.publish('userPresence', function() {
   // requires meteor add tmeasday:presence
   // Setup some filter to find the users your user
@@ -21,10 +26,10 @@ Meteor.startup(function(){
   // If for example we wanted to publish only logged in users we could apply:
   // filter = { userId: { $exists: true }};
   
-  var filter = { userId: { $exists: true }}; 
+    var filter = { userId: { $exists: true }}; 
 
     return Presences.find(filter, { fields: { state: true, userId: true }});
-    
+
   });
   
   
@@ -35,17 +40,27 @@ Meteor.startup(function(){
   Meteor.methods({
     'chatRegister': function(mycall, qthxy){
       if (typeof(mycall)==="string" && (mycall.length>0)){
-        mycall = mycall.toUpperCase();
-        sendMessage(mycall, 'sign on');
-        if (qthxy && qthxy.cx && qthxy.cy){
-          qthxy.cx = Math.round(qthxy.cx);
-          qthxy.cy = Math.round(qthxy.cy);
-          QTH.remove({'call': mycall});          
-          QTH.insert({'call': mycall, 'qthxy': qthxy, 't': +new Date()});
-        }
+        try { 
+          mycall = mycall.toUpperCase();
+          if (mycall === Meteor.user().username){
+            sendMessage(mycall, 'sign on');
+            if (qthxy && qthxy.cx && qthxy.cy){
+              qthxy.cx = Math.round(qthxy.cx);
+              qthxy.cy = Math.round(qthxy.cy);
+              QTH.remove({'call': mycall});          
+              QTH.insert({'call': mycall, 'qthxy': qthxy, 't': +new Date()});
+            }
+          }
+        } catch(e){ console.log("in chatregister, error:"+JSON.stringify(e));
+                  }
       }
       return true;
     },
-    'sendMessage': sendMessage
+    'sendMessage': function(msg){
+      try {
+        var mycall = Meteor.user().username;
+        sendMessage(mycall, msg);
+      } catch(e){ console.log("sendMesage call from bad user"); }
+    }
   });
 });

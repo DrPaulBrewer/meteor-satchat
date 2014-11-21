@@ -4,6 +4,7 @@
      </div>
      <button class="send signinEnabled">SEND</button>
      <textarea id="compose">Hello</textarea>
-    <br/><span class="signinWarning">sign in first!</span>
+    <br/>
+    {{#unless currentUser}}<span id="signinWarning">sign in first!</span>{{/unless}}
    </div>
 </template>

@@ -22,15 +22,27 @@ QTH = new Mongo.Collection("qth");
 Meteor.subscribe("track");
 Meteor.subscribe("messages");
 Meteor.subscribe("qth");
-Meteor.subscribe("userPresence");
+Meteor.subscribe("userPresence");  
 
-Presence.state = function() {
-  return {
-    callsign: Session.get('callsign')
-  };
-};
-
+  
 qthxy = {};
+
+whoIs = function(uid){
+  var found =  Meteor.users.findOne(uid);
+  if (found) found = found.username;
+  return found;
+}
+
+checkedIn = function(){
+  var everyone =  Presences.find().fetch();
+  var calls = [];
+  for(var i=0,l=everyone.length;i<l;++i){
+      if ((everyone[i].state) && (everyone[i].userId)){
+        calls.push(whoIs(everyone[i].userId));
+      }
+  }
+  return calls;
+};
 
 var registerHelpers = function(obj){
   for(var k in obj){
@@ -63,17 +75,54 @@ Template.room.helpers({
   }
 });
 
+Template.checkedIn.helpers({
+  roster: function(){
+    return checkedIn();
+  }
+})
+
 Template.world.events({
+  'click .qrz': function(event, template){
+    var qrz = $('#checkedInList').toggle();
+  },
+  'click .qso': function(event, template){
+
+  },
+  'click .signout': function(event, template){
+    if (confirm("thanks 73 was good qso - GO QRT?")){
+        Meteor.logout();
+        $('.signinEnabled').prop('disabled', true);
+        Session.set('callsign','');
+    }
+  },
   'click .signin': function(event, template){
-      var call = $('#myCall').val();
-      if ((typeof(call)==="string") && (call.length>2)){
-        call = call.toUpperCase();
-        $('#myCall').val(call);
-        Session.set('callsign',$('#myCall').val());
-        Meteor.call('chatRegister', $('#myCall').val(), qthxy);
-        $('#register').hide();
-        $('.signinWarning').hide();
-        $('.signinEnabled').prop('disabled',false);
+      var callsign = $('#callsign').val();
+      if ((typeof(callsign)==="string") && (callsign.length>2)){
+        callsign = callsign.toUpperCase();
+        $('#callsign').val(callsign);
+        Session.set('callsign',callsign);
+        var pass = $('#pass').val();
+        var onGoodPassword = function(){
+            console.log('good password');
+            Meteor.call('chatRegister', callsign, qthxy);
+            $('.signinEnabled').prop('disabled',false);          
+        };
+        Meteor.loginWithPassword(callsign, $('#pass').val(), function(e){
+          if (e){
+            Accounts.createUser({'username': callsign, 
+                                 'password': pass}, 
+                                 function(e){
+                                    if (e){
+                                       $('#signinWarning').text('bad password');
+                                    } else {
+                                       console.log('created user');
+                                       onGoodPassword();
+                                    }
+                                  });
+            } else {    
+              onGoodPassword();
+          }
+        });
       }
   }
 });
@@ -82,7 +131,7 @@ Template.room.events({
   'click .send': function(){
     if ($('#compose').val().length>2){
       $('#send').prop('disabled', true);
-      Meteor.call('sendMessage', $('#myCall').val(), $('#compose').val() );
+      Meteor.call('sendMessage', $('#compose').val() );
       $('#compose').val('');
       setTimeout(function(){
         $('#send').prop('disabled', false);
@@ -305,6 +354,14 @@ Meteor.startup(function(){
     // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
     // see http://stackoverflow.com/a/13082028/103081 for newlines to br
   });
+  
+  setTimeout(function(){
+    if (Meteor.userId()){
+      console.log(Meteor.userId());
+      console.log("recognized as:"+whoIs(Meteor.userId()));
+      $(".signinEnabled").prop("disabled",false);
+    }
+  }, 2000);
   
   setTimeout(QTHUpdater.bind({}, app.r), 3000);
 

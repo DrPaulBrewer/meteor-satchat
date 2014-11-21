@@ -24,7 +24,7 @@ div.room{
   max-width: 600px;
   max-height: 220px;
 }
-span.signinWarning {
+#signinWarning {
   color: red;
 }
 #compose {
@@ -35,4 +35,7 @@ button.send {
   float: right;
   width: 50px;
   height: 60px;
+}
+button.inactive {
+  display: none;
 }

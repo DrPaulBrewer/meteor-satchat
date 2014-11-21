@@ -2,12 +2,29 @@
  <div id="worldMap">
  </div>
  <div id="chatApp">
-   <p>satchat.net  
-     <span id="timeUTC"></span>
-     <span id="register">
-       callSign: <input type="text" size="10" id="myCall" />
-       <button class="signin">sign in</button>
+   <p>
+     <span id="whoAmI">
+     {{#if currentUser}}
+     <button class="signout">73</button>
+     {{currentUser.username}}
+     {{else}}
+     satchat.net
+     {{/if}}
      </span>
+     <span id="timeUTC"></span>
+     {{#if currentUser}}
+     <button class="inactive">qso</button>
+     <button class="inactive">qrz</button>
+     <button class="inactive">qsy</button>
+     <button class="inactive">set</button>
+     <button class="inactive">about</button>
+     {{else}}
+     <span id="register">
+       call: <input type="text" id="callsign" size="12"/> 
+       pass: <input type="password" id="pass" size="8"/>
+       <button class="signin">+</button>
+     </span>
+     {{/if}}
    </p>
    {{ > room }}
  </div>

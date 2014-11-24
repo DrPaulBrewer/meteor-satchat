@@ -4,6 +4,7 @@ Meteor.startup(function(){
   Messages = new Mongo.Collection("messages");
   QTH = new Mongo.Collection("qth");
   Lids = new Mongo.Collection("lids");
+  Nologins = new Mongo.Collection("nologins");
   Meteor.publish("track", function(){ 
     return Track.find(); 
   });
@@ -54,6 +55,29 @@ Meteor.startup(function(){
     Messages.insert(msg);
     return true;
   };
+  
+  var isNoLogin = function(call){
+    // calls may not have whitespace
+    if (/\s/.test(call)) return true;
+    if (/\d/.test(call)){
+      // has a digit, might be ok
+      return (!!Nologins.findOne({call: call.toLowerCase()}));
+    }
+    // no digits -- probably not a callsign
+    return true;
+  }
+  
+  // no forbidden calls for new users
+  
+  Accounts.validateNewUser(function (user) {
+    return (!isNoLogin(user.username));
+  }); 
+  
+  // no forbidden calls for existing users either
+  
+  Accounts.validateLoginAttempt(function(attempt){
+    return ( (attempt.user) && (!isNoLogin(attempt.user.username)) );
+  });
   
   Meteor.methods({
     'chatRegister': function(mycall, qthxy){

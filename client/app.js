@@ -110,7 +110,7 @@ Template.app.events({
                                  'password': pass}, 
                                  function(e){
                                     if (e){
-                                       $('#signinWarning').text('bad password');
+                                       $('#signinWarning').text('bad callsign or password');
                                     } else {
                                        console.log('created user');
                                        onGoodPassword();

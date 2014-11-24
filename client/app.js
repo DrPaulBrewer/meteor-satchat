@@ -31,7 +31,7 @@ whoIs = function(uid){
   var found =  Meteor.users.findOne(uid);
   if (found) found = found.username;
   return found;
-}
+};
 
 checkedIn = function(){
   var everyone =  Presences.find().fetch();
@@ -41,7 +41,7 @@ checkedIn = function(){
         calls.push(whoIs(everyone[i].userId));
       }
   }
-  return calls;
+  return calls.sort();
 };
 
 var registerHelpers = function(obj){
@@ -73,7 +73,7 @@ Template.app.helpers({
   msgs: function(){ 
     return Messages.find({});
   },
-  roster: function(){
+  checkedIn: function(){
     return checkedIn();
   }
 })

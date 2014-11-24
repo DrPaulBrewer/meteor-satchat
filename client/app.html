@@ -27,7 +27,13 @@
      {{/if}}
    </p>
    <div class="room">
-     <div id="mainRoomMessages">
+     <div id="checkIns">
+       Check-ins: 
+       {{#each checkedIn}}
+       <span class="checkin">{{this}}</span> 
+       {{/each}}
+     </div>
+     <div id="mainRoomMessages" class="vscroll hidelist">
      </div>
      <button class="send signinEnabled">SEND</button>
      <textarea id="compose">Hello</textarea>

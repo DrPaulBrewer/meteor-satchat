@@ -17,8 +17,14 @@ div.room{
   width: 600px;
   height: 250px;
 }
-#mainRoomMessages {
+#checkIns {
+  display:block;
   margin-top: -10px;
+  overflow-x: auto;
+  height: 30px;
+  max-width: 600 px;
+}
+div.vscroll {
   display: block;
   overflow-y: auto;
   max-width: 600px;

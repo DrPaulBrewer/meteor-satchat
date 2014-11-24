@@ -1,4 +1,7 @@
 /* CSS declarations go here */
+html {
+  font-size: 16;
+}
 #worldMap {
   display: block;
   position: absolute;
@@ -12,6 +15,9 @@
   left: 0px;
   width: 600px;
   height: 250px;
+}
+#chatTop {
+  font-size: 0.90em;
 }
 div.room{
   width: 600px;
@@ -39,6 +45,7 @@ div.vscroll {
 }
 button.send {
   float: right;
+  font-size: 0.7em;
   width: 52px;
   height: 65px;
 }

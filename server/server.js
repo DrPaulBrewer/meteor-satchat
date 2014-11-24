@@ -75,8 +75,11 @@ Meteor.startup(function(){
     },
     'sendMessage': function(msg){
       var t = +new Date();
+      var mycall = 'Nobody';
+      // dont send msgs that are too long
+      if (msg.length > 255) return false;
       try {
-        var mycall = Meteor.user().username;
+        mycall = Meteor.user().username;
         // rules for ignoring messages 
         if (prevMessageByCall[mycall]){
           if (msg===prevMessageByCall[mycall].txt) return false;
@@ -85,6 +88,10 @@ Meteor.startup(function(){
             prevMessageByCall[mycall].t = +new Date()+30000;
             return false;
           }
+        }
+        // fix ALL CAPS messages
+        if (msg.toUpperCase()===msg){
+          msg = msg.toLowerCase();
         }
         sendMessage(mycall, msg);
       } catch(e){ console.log("sendMesage call from bad user"); }

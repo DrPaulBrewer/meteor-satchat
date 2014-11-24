@@ -69,19 +69,16 @@ registerHelpers({
   }
 });
 
-Template.room.helpers({
+Template.app.helpers({
   msgs: function(){ 
     return Messages.find({});
-  }
-});
-
-Template.checkedIn.helpers({
+  },
   roster: function(){
     return checkedIn();
   }
 })
 
-Template.world.events({
+Template.app.events({
   'click .qrz': function(event, template){
     var qrz = $('#checkedInList').toggle();
   },
@@ -124,10 +121,7 @@ Template.world.events({
           }
         });
       }
-  }
-});
-
-Template.room.events({
+  },
   'click .send': function(){
     if ($('#compose').val().length>2){
       $('#send').prop('disabled', true);

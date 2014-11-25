@@ -143,7 +143,7 @@ Template.app.events({
 }); 
 
 Template.app.rendered = function(){
-  $('#chatBody').tabs().draggable();
+  $('#chatBody').tabs().draggable().resizable();
 }
 
 Template.msg.rendered = function(){

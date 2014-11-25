@@ -10,13 +10,14 @@ html {
 #chatApp {
   display: block;
   width: 600px;
-  height: 250px;
+  height: 500px;
 }
 #chatTop {
   font-size: 0.90em;
 }
 #chatBody {
   margin-top: 0px;
+  height: 80%;
 }
 .tabs {
   font-size: 0.7em;
@@ -30,26 +31,25 @@ span.chatsender {
 span.chathms { 
   font-size: 0.85em;
 }
-div.room{
-  width: 600px;
-}
-#checkIns {
-  display:block;
-  overflow-x: auto;
-  height: 30px;
-  max-width: 600 px;
+#mainRoomControls {
+  position: absolute;
+  bottom: 0px;
+  height: 70px;
+  width: 90%;
 }
 div.vscroll {
   display: block;
+  position: absolute;
+  top: 40px;
+  bottom: 80px;
   overflow-y: auto;
-  max-height: 200px;
-  max-width: 600px;
+  max-width: 100% ;
 }
 #signinWarning {
   color: red;
 }
 #compose {
-  width: 495px;
+  width: 87%;
   height: 60px;
 }
 #ignore {
@@ -59,8 +59,9 @@ div.vscroll {
 button.send {
   float: right;
   font-size: 10px;
-  width: 40px;
+  width: 10%;
   height: 65px;
+  margin: 0 0 0 0;
 }
 button.inactive {
   display: none;

@@ -59,8 +59,9 @@ Meteor.startup(function(){
   var isNoLogin = function(call){
     // calls may not have whitespace
     if (/\s/.test(call)) return true;
-    if (/\d/.test(call)){
-      // has a digit, might be ok
+    if ( (/^[A-Z0-9\-\/]+$/.test(call)) && (/[A-Z]/.test(call)) && (/\d/.test(call)) ){
+      // valid is A-Z 0-9 dash slant
+      // must have an A-Z and a 0-9
       return (!!Nologins.findOne({call: call.toLowerCase()}));
     }
     // no digits -- probably not a callsign

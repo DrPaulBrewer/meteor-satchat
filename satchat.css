@@ -4,28 +4,37 @@ html {
 }
 #worldMap {
   display: block;
-  position: absolute;
   width: 600px;
   height: 300px;
 }
 #chatApp {
   display: block;
-  position: absolute;
-  top: 290px;
-  left: 0px;
   width: 600px;
   height: 250px;
 }
 #chatTop {
   font-size: 0.90em;
 }
+#chatBody {
+  margin-top: 0px;
+}
+.tabs {
+  font-size: 0.7em;
+}
+p.chatmessage {
+  margin: 2px 0 2px 0 ;
+}
+span.chatsender {
+  font-size: 0.85em;
+}
+span.chathms { 
+  font-size: 0.85em;
+}
 div.room{
   width: 600px;
-  height: 250px;
 }
 #checkIns {
   display:block;
-  margin-top: -10px;
   overflow-x: auto;
   height: 30px;
   max-width: 600 px;
@@ -33,20 +42,24 @@ div.room{
 div.vscroll {
   display: block;
   overflow-y: auto;
+  max-height: 200px;
   max-width: 600px;
-  max-height: 220px;
 }
 #signinWarning {
   color: red;
 }
 #compose {
-  width: 540px;
+  width: 495px;
   height: 60px;
+}
+#ignore {
+  width: 495px;
+  height: 200px;
 }
 button.send {
   float: right;
-  font-size: 0.7em;
-  width: 52px;
+  font-size: 10px;
+  width: 40px;
   height: 65px;
 }
 button.inactive {

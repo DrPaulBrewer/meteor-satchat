@@ -26,6 +26,17 @@ Meteor.subscribe("userPresence");
 
   
 qthxy = {};
+Session.set('ignore',[]);
+
+var utcHMS = function(t){
+  d = new Date(t);
+  h = d.getUTCHours();
+  m = d.getUTCMinutes();
+  if (h<10) h='0'+h;
+  if (m<10) m='0'+m;
+  return h+':'+m;
+};
+
 
 whoIs = function(uid){
   var found =  Meteor.users.findOne(uid);
@@ -66,26 +77,23 @@ registerHelpers({
   },
   windowWidth: function(){
     return $(window).width();
-  }
-});
-
-Template.app.helpers({
+  },
   msgs: function(){ 
-    return Messages.find({});
+    var query = {call: {$nin: Session.get('ignore')}};
+    return Messages.find(query);
   },
   checkedIn: function(){
     return checkedIn();
-  }
-})
+  },
+  hms: utcHMS
+});
+
 
 Template.app.events({
-  'click .qrz': function(event, template){
-    var qrz = $('#checkedInList').toggle();
+  'keyup #ignore': function(event, template){
+    Session.set('ignore',$('#ignore').val().split(/[ ,]+/));
   },
-  'click .qso': function(event, template){
-
-  },
-  'click .signout': function(event, template){
+ 'click .signout': function(event, template){
     if (confirm("thanks 73 was good qso - GO QRT?")){
         Meteor.logout();
         $('.signinEnabled').prop('disabled', true);
@@ -134,6 +142,15 @@ Template.app.events({
   }
 }); 
 
+Template.app.rendered = function(){
+  $('#chatBody').tabs().draggable();
+}
+
+Template.msg.rendered = function(){
+    var chatDiv = $('#mainRoomMessages');
+    chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
+    // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
+};
 
 makeWorld = function (){
   var r = Raphael(0, 0, 600, 300);
@@ -247,14 +264,6 @@ var QTHUpdater = function(r){
 setTimeout(TrackUpdater, 3000);
 
 
-var utcHMS = function(t){
-  d = new Date(t);
-  h = d.getUTCHours();
-  m = d.getUTCMinutes();
-  if (h<10) h='0'+h;
-  if (m<10) m='0'+m;
-  return h+':'+m;
-}
 
 
 satPos = function(sat){
@@ -335,20 +344,7 @@ Meteor.startup(function(){
     $('#timeUTC').text(new Date().toUTCString());
   };
   UTC();
-  setInterval(UTC, 1000);
-  Tracker.autorun(function(){
-    var msgs = Messages.find({}).fetch();
-    var chat = msgs.map(function(m){
-      return m.call+'@'+utcHMS(m.t)+': '+m.txt;
-    }).join("\n");
-    var fix = $('#mainRoomMessages').text(chat);
-    fix.html(fix.html().replace(/\n/g,'<br/>'));
-    var chatDiv = $('#mainRoomMessages');
-    chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
-    // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
-    // see http://stackoverflow.com/a/13082028/103081 for newlines to br
-  });
-  
+  setInterval(UTC, 1000);  
   setTimeout(function(){
     if (Meteor.userId()){
       console.log(Meteor.userId());

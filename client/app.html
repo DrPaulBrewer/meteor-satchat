@@ -2,7 +2,7 @@
  <div id="worldMap">
  </div>
  <div id="chatApp">
-   <p id="chatTop">
+   <div id="chatTop">
      <span id="whoAmI">
      {{#if currentUser}}
        <button class="signout">73</button>
@@ -13,11 +13,6 @@
      </span>
      <span id="timeUTC"></span>
      {{#if currentUser}}
-       <button class="inactive">qso</button>
-       <button class="inactive">qrz</button>
-       <button class="inactive">qsy</button>
-       <button class="inactive">set</button>
-       <button class="inactive">about</button>
      {{else}}
        <span id="register">
          call: <input type="text" id="callsign" size="12"/> 
@@ -25,18 +20,45 @@
          <button class="signin">+</button>
        </span>
      {{/if}}
-   </p>
-   <div class="room">
-     <div id="checkIns">
+   </div>
+   <div id="chatBody">
+     <ul class="tabs">
+       <li><a href="#qso">QSO</a></li>
+       <li><a href="#qrz">QRZ</a></li>
+       <li><a href="#qrm">QRM</a></li>
+       <li><a href="#settings">SET</a></li>
+       <li><a href="#about">About</a></li>
+     </ul>
+     <div id="qso">
+       <div id="mainRoomMessages" class="vscroll">
+         {{#each msgs}}
+         {{ >msg }}
+         {{/each}}
+       </div>
+       <div id="mainRoomControls">
+         <button class="send signinEnabled">SEND</button>
+         <textarea id="compose">Hello</textarea>
+       </div>
+     </div>
+     <div id="qrz">
        Check-ins: 
        {{#each checkedIn}}
        <span class="checkin">{{this}}</span> 
        {{/each}}
      </div>
-     <div id="mainRoomMessages" class="vscroll hidelist">
+     <div id="qrm">
+       Ignore these callsigns:<br/>
+       <textarea id="ignore"></textarea>
      </div>
-     <button class="send signinEnabled">SEND</button>
-     <textarea id="compose">Hello</textarea>
+     <div id="settings">
+       Under construction
+     </div>
+     <div id="about">
+       <p>satchat: The only internet chat software with satellite tracking built in</p>
+       <p>Copyright 2014 Paul Brewer KI6CQ</p>
+       <p>Source code available under the MIT open source license</p>
+       <p>For more details see the <a href="http://satchat.net" target="_blank">satchat software page</a></p>
+     </div>
      <br/>
      {{#unless currentUser}}<span id="signinWarning">sign in first!</span>{{/unless}}
    </div>

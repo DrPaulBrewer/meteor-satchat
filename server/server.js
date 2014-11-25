@@ -105,6 +105,7 @@ Meteor.startup(function(){
       if (msg.length > 255) return false;
       try {
         mycall = Meteor.user().username;
+        // an exception will be caught if user is null -- ignoring message
         // rules for ignoring messages 
         if (prevMessageByCall[mycall]){
           if (msg===prevMessageByCall[mycall].txt) return false;
@@ -119,7 +120,7 @@ Meteor.startup(function(){
           msg = msg.toLowerCase();
         }
         sendMessage(mycall, msg);
-      } catch(e){ console.log("sendMesage call from bad user"); }
+      } catch(e){ }
     }
   });
 });

@@ -30,11 +30,12 @@ Session.set('ignore',[]);
 
 var utcHMS = function(t){
   d = new Date(t);
+  day = d.getUTCDate(t);
   h = d.getUTCHours();
   m = d.getUTCMinutes();
   if (h<10) h='0'+h;
   if (m<10) m='0'+m;
-  return h+':'+m;
+  return day+' '+h+':'+m;
 };
 
 
@@ -44,16 +45,52 @@ whoIs = function(uid){
   return found;
 };
 
+ignored = function(call){
+  if (!Session.get('ignore')) return false;
+  return (Session.get('ignore').indexOf(call)>=0);
+}
+
 checkedIn = function(){
   var everyone =  Presences.find().fetch();
   var calls = [];
+  var call;
   for(var i=0,l=everyone.length;i<l;++i){
       if ((everyone[i].state) && (everyone[i].userId)){
-        calls.push(whoIs(everyone[i].userId));
+        call = whoIs(everyone[i].userId);
+        if (!ignored(call)) calls.push(call);
       }
   }
   return calls.sort();
 };
+
+lastMessages = function(msgCursor, order){
+    var last = {}, lastmsgs = [],call='';
+    var msgs = msgCursor.fetch();
+    for(var i=0,l=msgs.length;i<l;++i){
+      call = msgs[i].call;
+      if (last[call]){
+        if (msgs[i].t>last[call].t){
+          last[call] = msgs[i];
+        }
+      } else {
+        last[call] = msgs[i];
+      }
+    }
+    for (k in last){
+      if (last.hasOwnProperty(k)) lastmsgs.push(last[k]);
+    }
+  if (order) lastmsgs.sort(order);
+  return lastmsgs;
+};
+
+orderBy = function(field, m){
+  return function(a,b){
+    if (a[field]>b[field]) return m;
+    if (a[field]<b[field]) return -m;
+    return 0;
+  }
+};
+
 
 var registerHelpers = function(obj){
   for(var k in obj){
@@ -82,6 +119,18 @@ registerHelpers({
     var query = {call: {$nin: Session.get('ignore')}};
     return Messages.find(query);
   },
+  announcements: function(){
+    var query = {$and: [{call: {$nin: Session.get('ignore')}},
+                        {t: {$gt: (+new Date() - 2*86400000)}},
+                                 {txt: {$in: [/^!/]}}
+                                ]};
+    var msgs =  Messages.find(query);
+    return lastMessages(msgs, orderBy('call'));
+  },
+  lastTransmission: function(){
+    var query = {call: {$nin: Session.get('ignore')}};
+    return lastMessages(Messages.find(query), orderBy('time', -1));
+  },
   checkedIn: function(){
     return checkedIn();
   },
@@ -91,7 +140,7 @@ registerHelpers({
 
 Template.app.events({
   'keyup #ignore': function(event, template){
-    Session.set('ignore',$('#ignore').val().split(/[ ,]+/));
+    Session.set('ignore',$('#ignore').val().replace(/\n/g,' ').split(/[ ,]+/));
   },
  'click .signout': function(event, template){
     if (confirm("thanks 73 was good qso - GO QRT?")){
@@ -144,13 +193,24 @@ Template.app.events({
 
 Template.app.rendered = function(){
   $('#chatBody').tabs().draggable().resizable();
+  Template.app.firstscrollqso = 1;
+  $('.firstscrollqso').click(function(){
+      if (Template.app.firstscrollqso) scrollToEnd($('#qso .vscroll'));
+      Template.app.firstscrollqso = 0;
+  });
 }
+
+// see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
+
+scrollToEnd = function(j){
+  console.log(j);
+  if (j && j.scrollTop) j.scrollTop(j.prop('scrollHeight'));
+};
 
 Template.msg.rendered = function(){
     // select the parent of the paragraph elements and scoll to end if scrollable
     var chatDiv = this.$('p').parent('.vscroll'); 
-    if (chatDiv && chatDiv.scrollTop) chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
-    // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
+    scrollToEnd(chatDiv);
 };
 
 makeWorld = function (){
@@ -263,9 +323,6 @@ var QTHUpdater = function(r){
 
 
 setTimeout(TrackUpdater, 3000);
-
-
-
 
 satPos = function(sat){
   var s = satTrack[sat];

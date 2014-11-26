@@ -23,12 +23,22 @@
    </div>
    <div id="chatBody">
      <ul class="tabs">
-       <li><a href="#qso">QSO</a></li>
+       <li><a href="#net">NET</a></li>
+       <li class="firstscrollqso"><a href="#qso">QSO</a></li>
        <li><a href="#qrz">QRZ</a></li>
        <li><a href="#qrm">QRM</a></li>
        <li><a href="#settings">SET</a></li>
        <li><a href="#about">About</a></li>
      </ul>
+     <div id="net">
+       <h3>Announcements</h3>
+       <p><i>To make an announcement, start your qso text with an exclamation point: !</i></p>
+       <div id="announcements" class="vscroll">
+         {{#each announcements}}
+         {{ >msg }}
+         {{/each}}
+       </div>
+     </div>
      <div id="qso">
        <div id="mainRoomMessages" class="vscroll">
          {{#each msgs}}
@@ -38,13 +48,23 @@
        <div id="mainRoomControls">
          <button class="send signinEnabled">SEND</button>
          <textarea id="compose">Hello</textarea>
+         <p><i>Begin with ! to make an announcement to Net</i></p>
        </div>
      </div>
-     <div id="qrz">
-       Check-ins: 
-       {{#each checkedIn}}
-       <span class="checkin">{{this}}</span> 
-       {{/each}}
+     <div id="qrz" class="vscroll">
+       <div id="checkIns">
+         <h3>Check-ins:</h3>
+         <h4>Current</h4>
+         <div>
+           {{#each checkedIn}}
+             <span class="checkin">{{this}}</span> 
+           {{/each}}
+         </div>
+         <h4>Last 24 hrs</h4>
+           {{#each lastTransmission}}
+           {{ >msg }}
+           {{/each}}
+       </div>
      </div>
      <div id="qrm">
        Ignore these callsigns:<br/>

@@ -147,8 +147,9 @@ Template.app.rendered = function(){
 }
 
 Template.msg.rendered = function(){
-    var chatDiv = $('#mainRoomMessages');
-    chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
+    // select the parent of the paragraph elements and scoll to end if scrollable
+    var chatDiv = this.$('p').parent('.vscroll'); 
+    if (chatDiv) chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
     // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
 };
 

@@ -179,8 +179,8 @@ Template.app.events({
         });
       }
   },
-  'click .send': function(){
-    if ($('#compose').val().length>2){
+  'keyup #compose': function(){
+    if (  ($('#compose').val().length>2) && (/\n$/.test($('#compose').val()))  ) {
       $('#send').prop('disabled', true);
       Meteor.call('sendMessage', $('#compose').val() );
       $('#compose').val('');
@@ -192,7 +192,11 @@ Template.app.events({
 }); 
 
 Template.app.rendered = function(){
-  $('#chatBody').tabs().draggable().resizable();
+  $('#chatBody').tabs();
+  if (($.browser) && (!$.browser.mobile)){
+    // desktop only
+    $('#chatBody').draggable().resizable();    
+  }
   Template.app.firstscrollqso = 1;
   $('.firstscrollqso').click(function(){
       if (Template.app.firstscrollqso) scrollToEnd($('#qso .vscroll'));
@@ -203,7 +207,6 @@ Template.app.rendered = function(){
 // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
 
 scrollToEnd = function(j){
-  console.log(j);
   if (j && j.scrollTop) j.scrollTop(j.prop('scrollHeight'));
 };
 

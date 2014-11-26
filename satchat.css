@@ -31,19 +31,21 @@ span.chatsender {
 span.chathms { 
   font-size: 0.85em;
 }
+div.vscroll {
+  overflow-y: auto;
+  max-width: 100% ;
+}
 #mainRoomControls {
   position: absolute;
   bottom: 0px;
   height: 70px;
   width: 90%;
 }
-div.vscroll {
+#mainRoomMessages {
   display: block;
   position: absolute;
   top: 40px;
-  bottom: 80px;
-  overflow-y: auto;
-  max-width: 100% ;
+  bottom: 80px;  
 }
 #signinWarning {
   color: red;

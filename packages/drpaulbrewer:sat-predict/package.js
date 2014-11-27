@@ -7,8 +7,9 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.0');
-  api.addFiles('drpaulbrewer:sat-predict.js');
+  api.use('mongo','server');
   api.export('satPredict', 'server');
+  api.addFiles('drpaulbrewer:sat-predict.js', 'server');
 });
 
 Package.onTest(function(api) {

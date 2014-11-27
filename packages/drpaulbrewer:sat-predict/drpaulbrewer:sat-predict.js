@@ -1,32 +1,56 @@
-var predictBinary = './private/predict/predict'
+// drpaulbrewer:sat-predict.js Copyright 2014 Paul Brewer KI6CQ
+// Open Source License: The MIT License http://opensource.org/licenses/MIT
+
+var baseDir = process.cwd().replace(/\/\.meteor.*$/, '');
+var predictBinary = baseDir+'/private/predict/predict';
+var updateKeps = '/bin/bash '+baseDir+'/private/predict/update-keps.sh'
+
+
 var child = Npm.require('child_process');
 var fs = Npm.require('fs');
+var e;
+
+try {
+  fs.symlinkSync(baseDir+'/private/predict/dotpredict',process.env.HOME+'/.predict','dir');
+} catch(e){};
+
 
 satPredict = {};
 
 satPredict.Track = new Mongo.Collection("track");
+satPredict.Track.remove({}, function(e){ if(e) console.log(e);});
 
 satPredict.groundTrack = function(sat, cb){
   var parseOutput = function(e, stdout, stderr){
     var ee;
-    if (e) return console.log('error executing predict:'+JSON.stringify(e));  
+    var result = [];
+    var t=0, tlast=0, lat=0, lon=0, row, lines, i=0, l=0;
+    if (e) {
+      console.log('error executing predict:'+JSON.stringify(e));
+      console.log('looking for predict binary at:'+predictBinary);
+      console.log('current working directory:'+process.cwd());
+      return null;      
+    }
     try {
-      var lines = stdout.split("\n");
-      var result = [];
-      var t, lat, lon, row;
-      for(var i=0,l=lines.length;i<l;++i){
+      lines = stdout.split("\n");
+      for(i=0,l=lines.length;i<l;++i){
         row = lines[i].split(/\s+/);
-        t = parseInt(row[0]);
-        lat = parseInt(row[7]);
-        lon = parseInt(row[8]);
-        if (lon>180) lon=lon-360;
-        if (t) result.push([lat,lon]);
+        try {
+          t = parseInt(row[0]);
+          lat = parseInt(row[7]);
+          lon = parseInt(row[8]);
+          if (lon>180) lon=lon-360;
+          if (t>tlast) {
+            result.push([lat,lon]);
+            tlast = t;
+          }
+        } catch(ee){};
       }
     } catch(ee){ return cb(ee,null); }
     cb(null,
        {'sat': sat,
         'start': d0,
-        'end': t,
+        'end': tlast,
         'delta': 60,
         'latlon': result
        }); 
@@ -37,7 +61,7 @@ satPredict.groundTrack = function(sat, cb){
   child.exec(cmd, parseOutput);
 };
 
-satPredict.satellites = ['NOAA-15',
+satPredict.defaultSatelliteList = ['NOAA-15',
                          'NOAA-18',
                          'NOAA-19',
                          'OSCAR-7',
@@ -46,25 +70,36 @@ satPredict.satellites = ['NOAA-15',
                          'OSCAR-50',
                          'ISS'];
 
-satPredict.updateTrack = function(satlist){
+var trackInsert = Meteor.bindEnvironment(function(e, track){
+  if (!e) satPredict.Track.insert(track);
+});
+
+satPredict.updateTrack = Meteor.bindEnvironment(function(satlist){
   var sats = satlist || satPredict.satellites;
-  var cb = function(e, track){
-    if (!e) satPredict.Track.insert(track);
-  };
   var refill = function(e){
-    if (e) return false;
+    if (e) return console.log('satPredict.Track.remove failed:'+e);
     for(var i=0,l=sats.length;i<l;++i) (function(i){  
-      setTimeout(function(){ satPredict.groundtrack(sats[i], cb);}, 200*i);
+       satPredict.groundTrack(sats[i], trackInsert);
     })(i);
   };
-  Track.remove({}, refill);
+  satPredict.Track.remove({}, refill);
+});
+
+satPredict.updateKeps = function(){
+  child.exec(updateKeps, function(e,stdout,stderr){if ((e) || (stderr)) console.log(e+stderr);});  
 };
 
-Meteor.startup(function(){
-  satPredict.updateTrack();
+satPredict.init = function(sats){
+  satPredict.satellites = sats || satPredict.defaultSatelliteList;
+  satPredict.updateKeps();
+  setTimeout( function(){ satPredict.updateTrack(); }, 30000);
   setInterval(function(){ satPredict.updateTrack();}, 86400.0*1000.0/2.0);
+  setInterval(function(){ satPredict.updateKeps();}, 86400.0*1000.0*7.0);
   Meteor.publish("track", function(){ 
     return Track.find(); 
-  });
-});
+  });  
+};
+
+
+
 

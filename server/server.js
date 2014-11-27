@@ -1,5 +1,6 @@
 // server.js
 Meteor.startup(function(){
+  satPredict.init(); // use default satellite list
   Track = satPredict.Track;
   Messages = new Mongo.Collection("messages");
   QTH = new Mongo.Collection("qth");

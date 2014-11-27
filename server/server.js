@@ -1,13 +1,11 @@
 // server.js
 Meteor.startup(function(){
-  Track = new Mongo.Collection("track");
+  Track = satPredict.Track;
   Messages = new Mongo.Collection("messages");
   QTH = new Mongo.Collection("qth");
   Lids = new Mongo.Collection("lids");
   Nologins = new Mongo.Collection("nologins");
-  Meteor.publish("track", function(){ 
-    return Track.find(); 
-  });
+
   Meteor.publish("messages", function(){
     return Messages.find();
   });

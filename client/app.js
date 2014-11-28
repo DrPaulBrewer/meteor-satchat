@@ -24,6 +24,7 @@ Meteor.subscribe("messages");
 Meteor.subscribe("qth");
 Meteor.subscribe("userPresence");  
 
+satmag = 1.0;
   
 qthxy = {};
 Session.set('ignore',[]);
@@ -174,18 +175,25 @@ Template.app.events({
         };
         Meteor.loginWithPassword(callsign, $('#pass').val(), function(e){
           if (e){
-            Accounts.createUser({'username': callsign, 
-                                 'password': pass}, 
-                                 function(e){
-                                    if (e){
-                                       $('#signinWarning').text('bad callsign or password');
-                                    } else {
-                                       console.log('created user');
-                                       onGoodPassword();
-                                    }
-                                  });
-            } else {    
-              onGoodPassword();
+            // if bad password -- do nothing
+            if (/password/.test(e.reason)) return false;
+            if (/not found/.test(e.reason)){
+              if (confirm("[create account] Check callsign for errors. You entered:  "+callsign)){
+                Accounts.createUser({'username': callsign, 
+                                     'password': pass}, 
+                                    function(e){
+                                      if (e){
+                                        $('#signinWarning').text('bad callsign or password');
+                                      } else {
+                                        console.log('created user');
+                                        onGoodPassword();
+                                      }
+                                    });
+
+              }
+            }
+          } else {    
+            onGoodPassword();
           }
         });
       }
@@ -204,6 +212,12 @@ Template.app.events({
         }, 1000);      
       }
     }
+  },
+  'click #satbigger': function(){
+    satmag = satmag * 1.5;
+  },
+  'click #satsmaller': function(){
+    satmag = satmag/1.5;
   }
 }); 
 
@@ -234,10 +248,10 @@ Template.msg.rendered = function(){
 
 makeWorld = function (){
   var r = Raphael(0, 0, 600, 300);
-  r.rect(0, 0, 1000, 400, 10).attr({
-    stroke: "none",
-    fill: "#fff"
-  });
+//  r.rect(0, 0, 1000, 400, 10).attr({
+//    stroke: "none",
+//    fill: "#fff"
+//  });
   world = r.image("/nasa-world-dec.jpg",0,0,600,300);
   world.getXY = function (lat, lon) {
     return {
@@ -380,11 +394,12 @@ Meteor.startup(function(){
     return app.r.setFinish();
   };
   drawSat = function(name, color){
+    var mag = 100;
     app.r.setStart();
     app.r.circle(0,0,5).attr("fill", color);
     app.r.rect(-15,5,30,10).attr("fill","#000");
     app.r.text(0,10,name).attr("fill", color);
-    return app.r.setFinish().transform("S1.5");
+    return app.r.setFinish().transform("s1.5");
   };
   shortNames = {
     'NOAA-15': 'N15',
@@ -401,7 +416,8 @@ Meteor.startup(function(){
   satAnimation = function(){
     var sats = Object.keys(satTrack);
     var fills = ['#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fff','#800','#080','#008'];
-    var balls = [];
+    app.balls = [];
+    var balls = app.balls;
     var coords;
     for(i=0,l=sats.length;i<l;++i){
       if (sats[i]==="ISS"){
@@ -413,7 +429,7 @@ Meteor.startup(function(){
     var animationStep = function(){
       for(i=0,l=sats.length;i<l;++i){
         var coords = satPosXY(sats[i]);
-        balls[i].transform("T"+coords.cx+","+coords.cy);
+        balls[i].transform("S"+satmag+"T"+coords.cx+","+coords.cy);
       }
     }
     setInterval(animationStep, 1000);

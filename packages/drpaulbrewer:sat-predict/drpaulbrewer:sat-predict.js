@@ -1,18 +1,29 @@
 // drpaulbrewer:sat-predict.js Copyright 2014 Paul Brewer KI6CQ
 // Open Source License: The MIT License http://opensource.org/licenses/MIT
 
-var baseDir = process.cwd().replace(/\/\.meteor.*$/, '');
-var predictBinary = baseDir+'/private/predict/predict';
-var updateKeps = '/bin/bash '+baseDir+'/private/predict/update-keps.sh'
+var path = Npm.require('path');
 
+var predictBinary = path.resolve('./assets/app/predict/predict');
+var updateKepsSh = path.resolve('./assets/app/predict/update-keps.sh');
+var updateKeps = '/bin/bash '+updateKepsSh;
+var dotpredict = path.resolve('./assets/app/predict/dotpredict');
+
+console.log('predictBinary:'+predictBinary);
+console.log('updateKeps:'+updateKeps);
+console.log('dotpredict:'+dotpredict);
 
 var child = Npm.require('child_process');
 var fs = Npm.require('fs');
+
 var e;
 
+console.log("cwd is:"+process.cwd());
+
 try {
-  fs.symlinkSync(baseDir+'/private/predict/dotpredict',process.env.HOME+'/.predict','dir');
-} catch(e){};
+  fs.chmodSync(predictBinary, 0755);
+  fs.chmodSync(updateKepsSh, 0755);
+  fs.symlinkSync(dotpredict, process.env.HOME+'/.predict','dir');
+} catch(e){console.log("error setting up files in sat-predict.js: "+e);};
 
 
 satPredict = {};

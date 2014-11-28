@@ -9,7 +9,7 @@ This app is written in the [Meteor Javascript framework](http://www.meteor.com)
 
 Contributions of code for features and patches are appreciated and will be mentioned in the CREDITS.
 
-This meteor-satchat github repository contains the meteor code.  The backend code that dumps predicted satellite locations into the mongoDB will be in the satchat-backend, to be created.
+This meteor-satchat github repository contains both the front end code and a custom Meteor package to bridge to a back end copy of KD2BD predict, a well-establised Linux text-based satellite prediction program by John A. Magliacane, KD2BD.
 
 Want to help out? test your own copy?
 

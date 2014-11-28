@@ -108,7 +108,7 @@ Meteor.startup(function(){
         // rules for ignoring messages 
         if (prevMessageByCall[mycall]){
           if (msg===prevMessageByCall[mycall].txt) return false;
-          if (t < (2000+prevMessageByCall[mycall].t)){
+          if (t < (1000+prevMessageByCall[mycall].t)){
             reportLid(this.connection,mycall,'flooding');
             prevMessageByCall[mycall].t = +new Date()+30000;
             return false;

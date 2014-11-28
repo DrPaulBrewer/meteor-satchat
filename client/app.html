@@ -2,6 +2,12 @@
  <div id="worldMap">
  </div>
  <div id="chatApp">
+   <div id="dialog-psi" title="Please Sign In First">
+     <p>
+       <span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+       <span class="red">Click OK - then Please sign in to use this feature</span>
+     </p>
+   </div>
    <div id="chatTop">
      <span id="whoAmI">
      {{#if currentUser}}
@@ -23,16 +29,15 @@
    </div>
    <div id="chatBody">
      <ul class="tabs">
-       <li><a href="#net">NET</a></li>
+       <li><a href="#qst">QST</a></li>
        <li class="firstscrollqso"><a href="#qso">QSO</a></li>
        <li><a href="#qrz">QRZ</a></li>
        <li><a href="#qrm">QRM</a></li>
        <li><a href="#settings">SET</a></li>
        <li><a href="#about">About</a></li>
      </ul>
-     <div id="net">
-       <h3>Announcements</h3>
-       <p><i>To make an announcement, start your qso text with an exclamation point: !</i></p>
+     <div id="qst">
+       <p class="small"><i>To make an announcement, start your qso text with an exclamation point: !</i></p>
        <div id="announcements" class="vscroll">
          {{#each announcements}}
          {{ >msg }}
@@ -47,7 +52,6 @@
        </div>
        <div id="mainRoomControls">
          <textarea id="compose"></textarea>
-         <p><i>Begin with ! to make an announcement to Net</i></p>
        </div>
      </div>
      <div id="qrz" class="vscroll">
@@ -80,6 +84,5 @@
        <p>For more details see the <a href="http://satchat.net" target="_blank">satchat software page</a></p>
      </div>
    </div>
-        {{#unless currentUser}}<span id="signinWarning">sign in first!</span>{{/unless}}
   </div>
 </template>

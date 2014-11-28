@@ -91,6 +91,16 @@ orderBy = function(field, m){
   }
 };
 
+var PleaseSignIn = function(){
+  $( "#dialog-psi" ).dialog({
+      modal: true,
+      buttons: {
+        Ok: function() {
+          $( this ).dialog( "close" );
+        }
+      }
+  });
+};
 
 var registerHelpers = function(obj){
   for(var k in obj){
@@ -138,6 +148,7 @@ registerHelpers({
 });
 
 
+
 Template.app.events({
   'keyup #ignore': function(event, template){
     Session.set('ignore',$('#ignore').val().replace(/\n/g,' ').split(/[ ,]+/));
@@ -180,13 +191,18 @@ Template.app.events({
       }
   },
   'keyup #compose': function(){
-    if (  ($('#compose').val().length>2) && (/\n$/.test($('#compose').val()))  ) {
-      $('#send').prop('disabled', true);
-      Meteor.call('sendMessage', $('#compose').val() );
-      $('#compose').val('');
-      setTimeout(function(){
-        $('#send').prop('disabled', false);
-      }, 1000);      
+    if (!Meteor.userId()){
+      // not logged in
+      PleaseSignIn();
+    } else {
+      if ( ($('#compose').val().length>2) && (/\n$/.test($('#compose').val()))  ) {
+        $('#send').prop('disabled', true);
+        Meteor.call('sendMessage', $('#compose').val() );
+        $('#compose').val('');
+        setTimeout(function(){
+          $('#send').prop('disabled', false);
+        }, 1000);      
+      }
     }
   }
 }); 
@@ -348,6 +364,7 @@ satPos = function(sat){
 
 Meteor.startup(function(){
   $('.signinEnabled').prop('disabled',true);
+  $('#dialog-psi').hide();
   app = makeWorld();
   satPosXY = function(sat){
     var pos = satPos(sat);

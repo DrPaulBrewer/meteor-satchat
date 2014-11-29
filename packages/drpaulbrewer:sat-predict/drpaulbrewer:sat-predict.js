@@ -35,7 +35,10 @@ satPredict.groundTrack = function(sat, cb){
   var parseOutput = function(e, stdout, stderr){
     var ee;
     var result = [];
-    var t=0, tlast=0, lat=0, lon=0, row, lines, i=0, l=0;
+    var Re = 6378; // Earth radius in km
+    var t=0, tlast=0, el=0, az=0, lat=0, lon=0, slant=0, row, lines, i=0, l=0, x=0, y=0, z=0, r=0;
+    var checklat=0, checklon=0;
+    var ZZ = new LatLon(0.0,0.0);
     if (e) {
       console.log('error executing predict:'+JSON.stringify(e));
       console.log('looking for predict binary at:'+predictBinary);
@@ -48,11 +51,22 @@ satPredict.groundTrack = function(sat, cb){
         row = lines[i].split(/\s+/);
         try {
           t = parseInt(row[0]);
+          el = parseInt(row[4]);
+          az = parseInt(row[5]);
           lat = parseInt(row[7]);
           lon = parseInt(row[8]);
+          slant = parseInt(row[9]);
+          x = Re+slant*Math.sin(Math.PI*el/180);
+          y = slant*Math.cos(Math.PI*el/180)*Math.sin(Math.PI*az/180);
+          z = slant*Math.cos(Math.PI*el/180)*Math.cos(Math.PI*az/180);
+          r = Math.sqrt(x*x+y*y+z*z);
+          checklat = 180*Math.atan(z/Math.sqrt(x*x+y*y))/Math.PI;
+          if (Math.abs(lat-checklat)>2){
+            console.log("Warning:  in sat-predict.js lat!=checklat "+lat+' '+checklat);
+          }
           if (lon>180) lon=lon-360;
           if (t>tlast) {
-            result.push([lat,lon]);
+            result.push([lat,lon, r-Re]);
             tlast = t;
           }
         } catch(ee){};

@@ -8,6 +8,8 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.0');
   api.use('mongo','server');
+  api.use('mrt:latlon','server');
+  api.imply('mrt:latlon');
   api.export('satPredict', 'server');
   api.addFiles('drpaulbrewer:sat-predict.js', 'server');
 });

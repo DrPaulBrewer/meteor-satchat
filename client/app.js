@@ -27,6 +27,8 @@ Meteor.subscribe("userPresence");
 satmag = 1.0;
   
 qthxy = {};
+myQTH = new LatLon(0,0);
+
 Session.set('ignore',[]);
 
 var utcHMS = function(t){
@@ -270,6 +272,7 @@ makeWorld = function (){
     navigator.geolocation && navigator.geolocation.getCurrentPosition(
       function (pos) {
         qthxy = world.getXY(pos.coords.latitude, pos.coords.longitude);
+        myQTH = new LatLon(pos.coords.latitude, pos.coords.longitude);
       });
   } catch (e) {}
 

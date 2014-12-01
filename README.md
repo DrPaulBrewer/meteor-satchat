@@ -15,4 +15,6 @@ Want to help out? test your own copy?
 
 Instructions for setup on a [nitrous.io development VPS](https://www.nitrous.io/join/1gTLHmZbZMc?utm_source=nitrous.io&utm_medium=copypaste&utm_campaign=referral) to follow...
 
+version 0.5.0 uses the [John Magliacane's KD2BD Predict](http://www.qsl.net/kd2bd/predict.html) binary on the back end (License: GPL).  That binary for 64 bit Ubuntu and the source tarball are also included.
+
 Paul Brewer, KI6CQ, 20 Nov 2014

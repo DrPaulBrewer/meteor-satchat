@@ -1,5 +1,5 @@
 TLE = new Mongo.Collection("tle");
-TLE.remove({}, function(e){ if(e) console.log("TLE.remove"+e); });
+TLE.remove({}, function(e){ if(e) console.log("TLE.remove:"+e); });
 
 var urls = [
   'http://www.celestrak.com/NORAD/elements/amateur.txt',

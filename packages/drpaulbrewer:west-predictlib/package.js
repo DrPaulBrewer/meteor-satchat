@@ -7,7 +7,8 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.0');
-  api.addFiles('drpaulbrewer:west-predictlib.js');
+  api.export("PLib","client");
+  api.addFiles('drpaulbrewer:west-predictlib.js', 'client');
 });
 
 Package.onTest(function(api) {

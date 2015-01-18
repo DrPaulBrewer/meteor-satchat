@@ -17,9 +17,9 @@ var updateTLE = function(){
       if (((i%3) === 0) && (lines[i].length<1)) done=1;
       if (!done){ 
         if ((i%3)===0){
-          result.push([lines[i].rstrip()]);
+          result.push([lines[i].trim()]);
         } else {
-          result[Math.floor(i/3)].push(lines[i].rstrip());
+          result[Math.floor(i/3)].push(lines[i].trim());
         }
       }
     }
@@ -29,8 +29,6 @@ var updateTLE = function(){
            urls.map(
              function(u){ 
                var remote = HTTP.get(u);
-               console.log(u);
-               console.log(remote);
                return convert(remote.content); 
              }
            ));

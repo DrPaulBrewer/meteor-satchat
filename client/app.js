@@ -19,9 +19,11 @@
 Track = new Mongo.Collection("track");
 Messages = new Mongo.Collection("messages");
 QTH = new Mongo.Collection("qth");
+TLE = new Mongo.Collection("tle");
 Meteor.subscribe("track");
 Meteor.subscribe("messages");
 Meteor.subscribe("qth");
+Meteor.subscribe("tle");
 Meteor.subscribe("userPresence");  
 
 satmag = 1.0;

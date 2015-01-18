@@ -1888,3 +1888,8 @@ PLib =
 
 PLib.obs_geodetic = new PLib.geodetic_t();
 PLib.tle = new PLib.tle_t();
+// added by Paul Brewer Jan 2015 to link to retreive TLE data from Mongo 
+console.log(PLib);
+setTimeout(function(){
+    PLib.tleData = TLE.findOne().tleData;
+},3100);

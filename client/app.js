@@ -16,6 +16,10 @@
 // 
 //
 
+var updatePLibTLEs = function(){
+    if (PLib) PLib.tleData = TLE.findOne().tleData;
+};
+
 Track = new Mongo.Collection("track");
 Messages = new Mongo.Collection("messages");
 QTH = new Mongo.Collection("qth");
@@ -23,8 +27,9 @@ TLE = new Mongo.Collection("tle");
 Meteor.subscribe("track");
 Meteor.subscribe("messages");
 Meteor.subscribe("qth");
-Meteor.subscribe("tle");
+Meteor.subscribe("tle", updatePLibTLEs);
 Meteor.subscribe("userPresence");  
+
 
 satmag = 1.0;
   
@@ -275,6 +280,7 @@ makeWorld = function (){
       function (pos) {
         qthxy = world.getXY(pos.coords.latitude, pos.coords.longitude);
         myQTH = new LatLon(pos.coords.latitude, pos.coords.longitude);
+        if (PLib && PLib.configureGroundStation) PLib.configureGroundStation(pos.coords.latitude, pos.coords.longitude);
       });
   } catch (e) {}
 

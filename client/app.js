@@ -17,7 +17,12 @@
 //
 
 var updatePLibTLEs = function(){
-    if (PLib) PLib.tleData = TLE.findOne().tleData;
+  try {
+    PLib.tleData = TLE.findOne().tleData;
+    PLib.InitializeData(); 
+  } catch(e) {
+    console.log("error in app.js updatePLibTLEs:",e)
+  }
 };
 
 Track = new Mongo.Collection("track");

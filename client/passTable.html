@@ -1,0 +1,24 @@
+<template name="passTable">
+<table id="passData">
+    <thead>
+         <tr>
+           <th>AOS UTC</th>
+           <th>Name</th>
+           <th>Orbit</th>
+           <th>AOS Az</th>
+           <th>AOS R</th>
+           <th>CA Az</th>
+           <th>CA El</th>
+           <th>CA R</th>
+           <th>LOS Az</th>
+           <th>LOS R</th>
+           <th>LOS UTC</th>
+         </tr>
+  </thead>
+  <tbody>
+        {{#each passes}}
+        {{ > passTableRow }}
+        {{/each}}
+  </tbody>
+</table>
+</template>

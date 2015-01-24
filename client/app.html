@@ -33,6 +33,7 @@
        <li class="firstscrollqso"><a href="#qso">QSO</a></li>
        <li><a href="#qrz">QRZ</a></li>
        <li><a href="#qrm">QRM</a></li>
+       <li><a href="#passes">PASSES</a></li>
        <li><a href="#settings">SET</a></li>
        <li><a href="#about">About</a></li>
      </ul>
@@ -72,6 +73,9 @@
      <div id="qrm">
        Ignore these callsigns:<br/>
        <textarea id="ignore"></textarea>
+     </div>
+     <div id="passes" class="vscroll">
+      {{ >passTable }}
      </div>
      <div id="settings">
        <div>satellite size: 

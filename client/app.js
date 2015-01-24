@@ -16,8 +16,11 @@
 // 
 //
 
+var _depTLE = new Deps.Dependency();
+
 var updatePLibTLEs = function(){
   try {
+    _depTLE.changed();
     PLib.tleData = TLE.findOne().tleData;
     PLib.InitializeData(); 
   } catch(e) {
@@ -162,7 +165,17 @@ registerHelpers({
   hms: utcHMS
 });
 
-
+Template.passTable.helpers({
+  passes: function(){
+    var listOfPasses = PLib.getTodaysPasses();
+    listOfPasses.sort(function(a,b){
+      return a.dateTimeStart-b.dateTimeStart;
+    });
+    _depTLE.depend();
+    // thanks  http://stackoverflow.com/a/18216255/103081 for how to define explicit dependencies
+    return listOfPasses;
+  }
+})
 
 Template.app.events({
   'keyup #ignore': function(event, template){
@@ -246,7 +259,7 @@ Template.app.rendered = function(){
       if (Template.app.firstscrollqso) scrollToEnd($('#qso .vscroll'));
       Template.app.firstscrollqso = 0;
   });
-}
+};
 
 // see http://stackoverflow.com/a/11551414/103081 for scroll to bottom
 
@@ -262,10 +275,6 @@ Template.msg.rendered = function(){
 
 makeWorld = function (){
   var r = Raphael(0, 0, 600, 300);
-//  r.rect(0, 0, 1000, 400, 10).attr({
-//    stroke: "none",
-//    fill: "#fff"
-//  });
   world = r.image("/nasa-world-dec.jpg",0,0,600,300);
   world.getXY = function (lat, lon) {
     return {
@@ -285,7 +294,10 @@ makeWorld = function (){
       function (pos) {
         qthxy = world.getXY(pos.coords.latitude, pos.coords.longitude);
         myQTH = new LatLon(pos.coords.latitude, pos.coords.longitude);
-        if (PLib && PLib.configureGroundStation) PLib.configureGroundStation(pos.coords.latitude, pos.coords.longitude);
+        if (PLib && PLib.configureGroundStation) {
+          PLib.configureGroundStation(pos.coords.latitude, pos.coords.longitude);
+          _depTLE.changed();
+        }
       });
   } catch (e) {}
 
@@ -294,7 +306,8 @@ makeWorld = function (){
     'world': world
   }
 };
-  
+
+
 satTrack = {};
 
 var TrackUpdater = function(){

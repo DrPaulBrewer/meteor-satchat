@@ -1,5 +1,3 @@
-// Write your tests here!
-// Here is an example.
-Tinytest.add('example', function (test) {
-  test.equal(true, true);
+Tinytest.add('ham-grid-square-self-test', function (test) {
+  test.equal(HamGridSquare.test(), true);
 });

@@ -16,11 +16,11 @@
 // 
 //
 
-var _depTLE = new Deps.Dependency();
+var _depSat = new Deps.Dependency();
 
 var updatePLibTLEs = function(){
   try {
-    _depTLE.changed();
+    _depSat.changed();
     PLib.tleData = TLE.findOne().tleData;
     PLib.InitializeData(); 
   } catch(e) {
@@ -171,7 +171,7 @@ Template.passTable.helpers({
     listOfPasses.sort(function(a,b){
       return a.dateTimeStart-b.dateTimeStart;
     });
-    _depTLE.depend();
+    _depSat.depend();
     // thanks  http://stackoverflow.com/a/18216255/103081 for how to define explicit dependencies
     return listOfPasses;
   }
@@ -296,7 +296,7 @@ makeWorld = function (){
         myQTH = new LatLon(pos.coords.latitude, pos.coords.longitude);
         if (PLib && PLib.configureGroundStation) {
           PLib.configureGroundStation(pos.coords.latitude, pos.coords.longitude);
-          _depTLE.changed();
+          _depSat.changed();
         }
       });
   } catch (e) {}

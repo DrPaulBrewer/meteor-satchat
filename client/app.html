@@ -8,6 +8,11 @@
        <span class="red">Click OK - then Please sign in to use this feature</span>
      </p>
    </div>
+   <div id="dialog-grid" class="initiallyHidden" title="Whats your grid square?">
+     <p>
+       <span class="orange">Plase set your grid square in the QTH tab for local satellite calculations and the login map</span>
+     </p>
+   </div>
    <div id="chatTop">
      <span id="whoAmI">
      {{#if currentUser}}
@@ -33,6 +38,7 @@
        <li class="firstscrollqso"><a href="#qso">QSO</a></li>
        <li><a href="#qrz">QRZ</a></li>
        <li><a href="#qrm">QRM</a></li>
+       <li><a href="#qth">QTH</a></li>
        <li><a href="#passes">PASSES</a></li>
        <li><a href="#settings">SET</a></li>
        <li><a href="#about">About</a></li>
@@ -73,6 +79,13 @@
      <div id="qrm">
        Ignore these callsigns:<br/>
        <textarea id="ignore"></textarea>
+     </div>
+     <div id="qth" class="vscroll">
+       <p><label for="myGrid">Your Grid QTH:  </label>
+       <input type="text" name="myGrid" id="myGrid" size="6" />
+       <button id="updateMyGrid">Update</button>
+       </p>
+       {{ >qthTable }}
      </div>
      <div id="passes" class="vscroll">
       {{ >passTable }}

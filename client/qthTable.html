@@ -1,0 +1,17 @@
+<template name="qthTable">
+<table id="qthData">
+    <thead>
+         <tr>
+           <th>Call</th>
+           <th>Grid</th>
+           <th>az</th>
+           <th>km</th>
+         </tr>
+  </thead>
+  <tbody>
+        {{#each qths}}
+        {{ > qthTableRow }}
+        {{/each}}
+  </tbody>
+</table>
+</template>

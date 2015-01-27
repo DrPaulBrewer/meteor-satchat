@@ -162,7 +162,16 @@ registerHelpers({
   checkedIn: function(){
     return checkedIn();
   },
-  hms: utcHMS
+  hms: utcHMS,
+  qths: function(){
+    return QTH.find({}).fetch();
+  },
+  bearingToGrid: function(grid){
+    myQTH.bearingTo(HamGridSquare.toLatLon(grid));
+  },
+  distanceToGrid: function(grid){
+    myQTH.distanceTo(HamGridSquare.toLatLon(grid));
+  }
 });
 
 Template.passTable.helpers({

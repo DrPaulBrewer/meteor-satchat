@@ -407,7 +407,7 @@ satPos = function(sat){
 
 Meteor.startup(function(){
   $('.signinEnabled').prop('disabled',true);
-  $('#dialog-psi').hide();
+  $('.initiallyHidden').hide();
   app = makeWorld();
   satPosXY = function(sat){
     var pos = satPos(sat);

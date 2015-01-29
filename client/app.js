@@ -1,4 +1,4 @@
-// satchat Copyright 2014 
+// satchat Copyright 2014, 2015
 // Paul Brewer KI6CQ - Economic and Financial Technology Consulting LLC - www.eaftc.com
 //
 // <your name could be here too> if you contribute code features or patches we use
@@ -18,21 +18,53 @@
 
 var _depSat = new Deps.Dependency();
 
+var satWanted = [['(AO-7)','AO7'],
+             ['(SO-50)','SO50'],
+             ['NOAA 15','N15'],
+             ['NOAA 18','N18'],
+             ['NOAA 19','N19'],
+             ['(FO-29)','FO29'],
+             ['(AO-73)','AO73'],
+                 ["ISS", "ISS"]
+            ];
+
+var sats = [];
+for(var i=0,l=satWanted.length; i<l; ++i) sats.push(satWanted[i][1]);
+
+var filterTLE = function(tle, spec){
+  var i,l,j,match;
+  var tleLength = tle.length;
+  var tleOut = [];
+  for(i=0,l=spec.length;i<l;++i){
+    j = tle.length;
+    match = false;
+    while ((!match) && (j>0)){
+      --j;
+      match = (tle[j][0].indexOf(spec[i][0])>=0);
+    }
+    if (match) {
+      tle[j][0] = spec[i][1];
+      tleOut.push(tle[j]);
+    }
+  }
+  return tleOut;
+}
+
 var updatePLibTLEs = function(){
+  var rawTLE, filteredTLE;
   try {
-    _depSat.changed();
-    PLib.tleData = TLE.findOne().tleData;
+    PLib.tleData = filterTLE(TLE.findOne({'expire':{$gt:+(new Date())}}).tleData, 
+                             satWanted);
     PLib.InitializeData(); 
+    _depSat.changed();
   } catch(e) {
     console.log("error in app.js updatePLibTLEs:",e)
   }
 };
 
-Track = new Mongo.Collection("track");
 Messages = new Mongo.Collection("messages");
 QTH = new Mongo.Collection("qth");
 TLE = new Mongo.Collection("tle");
-Meteor.subscribe("track");
 Meteor.subscribe("messages");
 Meteor.subscribe("qth");
 Meteor.subscribe("tle", updatePLibTLEs);
@@ -354,23 +386,6 @@ makeWorld = function (){
 };
 
 
-satTrack = {};
-
-var TrackUpdater = function(){
-  Tracker.autorun(function(){
-    console.log("fetching satellite tracks");
-    var now = Math.floor((+new Date()/1000.0));
-    var tracks = Track.find({'end': {$gt: now}}).fetch();
-    for(i=0,l=tracks.length; i<l; ++i){
-      if ((typeof satTrack[tracks[i].sat] === "undefined") || 
-          (tracks[i].end>satTrack[tracks[i].sat].end) ){
-        console.log("found: "+tracks[i].sat+" --> "+shortName(tracks[i].sat));
-        satTrack[tracks[i].sat] = tracks[i];
-      }
-    }
-  });    
-};
-
 lastSeenSec = function(call){
   var qthFound = QTH.findOne({'call':call});
   var msgFound = Messages.findOne({'call':call}, {$sort: {'t':-1}});
@@ -431,24 +446,12 @@ var QTHUpdater = function(r){
 };
 
 
-setTimeout(TrackUpdater, 3000);
-
 satPos = function(sat){
-  var s = satTrack[sat];
-  var time = (+new Date())/1000;
-  var idx = Math.floor((time-s.start)/s.delta);
-  var q1 = ((time - s.start)%s.delta)/s.delta;
-  var q0 = 1.0 - q1;
-  var pos0 = s.latlon[idx];
-  var pos1 = s.latlon[idx+1];
-  var pos = [];
-  pos[0] = pos0[0]*q0+pos1[0]*q1;
-  if (Math.abs(pos0[1]-pos1[1])<170){
-    pos[1] = pos0[1]*q0+pos1[1]*q1;    
-  } else { 
-    pos[1] = -179.99;  // just stick it on the eastern edge for now
-  }
-  return pos; // returns a 2 element array lat, -long
+  var s;
+  try {
+    s = PLib.QuickFind(sat);
+  } catch(e){ console.log("in satPos: "+sat+" error: "+e); }
+  return new LatLon(s.latitude, s.longitude);
 };
 
 Meteor.startup(function(){
@@ -457,7 +460,7 @@ Meteor.startup(function(){
   app = makeWorld();
   satPosXY = function(sat){
     var pos = satPos(sat);
-    return app.world.getXY(pos[0],-pos[1]); // -pos[1] because predict uses +long for West, - for east
+    return app.world.getXY(pos._lat, pos._lon); // 
     // returns an object with cx, cy attributes, ready to use in RaphaelJS circle.attr() function
   }
   drawISS = function(){
@@ -476,20 +479,7 @@ Meteor.startup(function(){
     app.r.text(0,10,name).attr("fill", color);
     return app.r.setFinish().transform("s1.5");
   };
-  shortNames = {
-    'NOAA-15': 'N15',
-    'NOAA-18': 'N18',
-    'NOAA-19': 'N19',
-    'OSCAR-7': 'AO7',
-    'OSCAR-29': 'FO29',
-    'OSCAR-50': 'SO50',
-    'FUNCUBE-1': 'AO73'
-  };
-  shortName = function(predictName){
-    return shortNames[predictName] || predictName;    
-  }
   satAnimation = function(){
-    var sats = Object.keys(satTrack);
     var fills = ['#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fff','#800','#080','#008'];
     app.balls = [];
     var balls = app.balls;
@@ -498,7 +488,7 @@ Meteor.startup(function(){
       if (sats[i]==="ISS"){
         balls[i] = drawISS();
       } else {
-        balls[i] = drawSat(shortName(sats[i]), fills[i]);
+        balls[i] = drawSat(sats[i], fills[i]);
       }
     }
     var animationStep = function(){

@@ -32,7 +32,7 @@ var updateTLE = function(){
                return convert(remote.content); 
              }
            ));
-  console.log(r);
+  console.log("updated TLEs for "+r.length+" satellites");
   TLE.insert({
     'begin': (+new Date()),
     'expire': (+new Date()+1000*3600*24*7),

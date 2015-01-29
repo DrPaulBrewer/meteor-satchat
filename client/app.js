@@ -41,9 +41,6 @@ Meteor.subscribe("userPresence");
 
 satmag = 1.0;
   
-qthxy = {};
-myQTH = new LatLon(0,0);
-
 Session.set('ignore',[]);
 
 var utcHMS = function(t){
@@ -63,10 +60,29 @@ whoIs = function(uid){
   return found;
 };
 
+myCall = '';
+myGrid = '';
+myLatLon = new LatLon(0,0);
+
+Tracker.autorun(function(){
+  myCall = Session.get('callsign');
+  if (myCall){
+    try {
+      myGrid = QTH.findOne({'call':myCall}).grid;
+      myLatLon = HamGridSquare.toLatLon(myGrid);
+      $('.myGrid').val(myGrid);
+      $('.myLat').val(myLatLon._lat);
+      $('.myLon').val(myLatLon._lon);
+      PLib.configureGroundStation(myLatLon._lat, myLatLon._lon);
+      _depSat.changed();  
+    } catch(e){};
+  }
+});
+
 ignored = function(call){
   if (!Session.get('ignore')) return false;
   return (Session.get('ignore').indexOf(call)>=0);
-}
+};
 
 checkedIn = function(){
   var everyone =  Presences.find().fetch();
@@ -164,13 +180,19 @@ registerHelpers({
   },
   hms: utcHMS,
   qths: function(){
-    return QTH.find({}).fetch();
+    return QTH.find({},{sort: {"call": 1}}).fetch();
   },
   bearingToGrid: function(grid){
-    myQTH.bearingTo(HamGridSquare.toLatLon(grid));
+    try {
+      if ((grid) && (myLatLon)) return Math.round(myLatLon.bearingTo(HamGridSquare.toLatLon(grid)));
+    } catch(e){ console.log("in bearingToGrid "+grid+" error:"+e); };
+    return '';
   },
   distanceToGrid: function(grid){
-    myQTH.distanceTo(HamGridSquare.toLatLon(grid));
+    try {
+      if ((grid) && (myLatLon)) return Math.round(myLatLon.distanceTo(HamGridSquare.toLatLon(grid)));
+    } catch(e){ console.log("in distanceToGrid "+grid+" error:"+e); };
+    return '';
   }
 });
 
@@ -206,7 +228,7 @@ Template.app.events({
         var pass = $('#pass').val();
         var onGoodPassword = function(){
             console.log('good password');
-            Meteor.call('chatRegister', callsign, qthxy);
+            Meteor.call('chatRegister', callsign);
             $('.signinEnabled').prop('disabled',false);          
         };
         Meteor.loginWithPassword(callsign, $('#pass').val(), function(e){
@@ -241,7 +263,7 @@ Template.app.events({
     } else {
       if ( ($('#compose').val().length>2) && (/\n$/.test($('#compose').val()))  ) {
         $('#send').prop('disabled', true);
-        Meteor.call('sendMessage', $('#compose').val() );
+        Meteor.call('sendMessage', $('#compose').val());
         $('#compose').val('');
         setTimeout(function(){
           $('#send').prop('disabled', false);
@@ -254,6 +276,31 @@ Template.app.events({
   },
   'click #satsmaller': function(){
     satmag = satmag/1.5;
+  },
+  'click #updateQTHviaBrowser': function(){
+      try {
+        console.log("updating grid from browser geolocation data");
+        if (navigator.geolocation) navigator.geolocation.getCurrentPosition(
+          function (pos) {
+            var grid;
+            if (pos.coords) grid = HamGridSquare.fromLatLon(pos.coords);
+            if (grid) Meteor.call('chatRegister', myCall, grid);
+          });
+      } catch (e) { console.log("error updating QTH via browser:"+e); };
+  },
+  'click #updateMyGrid': function(){
+    console.log("updating grid to:"+$('#myGrid').val());
+    Meteor.call('chatRegister', myCall, $('#myGrid').val());    
+  },
+  'click #updateMyLatLon': function(){
+    try {
+      console.log("converting lat/lon to grid");
+      Meteor.call('chatRegister', myCall, HamGridSquare.fromLatLon(
+        $('#myLat').val(),
+        $('#myLon').val()
+        )
+                 );
+    } catch(e){ console.log("error updating QTH via Lat/Lon:"+e); };
   }
 }); 
 
@@ -292,23 +339,13 @@ makeWorld = function (){
     };
   };
   world.getLatLon = function (x, y) {
-    return {
-      lat: (y - 150.0) / -(90.0/150.0),
-      lon: (x - 300.0) / (180.0/300.0)
-    };
+    var lat,lon;
+    lat = (y - 150.0) * (-90.0/150.0);
+    lon = (x - 300.0) * (180.0/300.0);
+    if (typeof(LatLon)==='function') return new LatLon(lat,lon);
+    return {"lat": lat, "lon": lon}
   };
 
-  try {
-    navigator.geolocation && navigator.geolocation.getCurrentPosition(
-      function (pos) {
-        qthxy = world.getXY(pos.coords.latitude, pos.coords.longitude);
-        myQTH = new LatLon(pos.coords.latitude, pos.coords.longitude);
-        if (PLib && PLib.configureGroundStation) {
-          PLib.configureGroundStation(pos.coords.latitude, pos.coords.longitude);
-          _depSat.changed();
-        }
-      });
-  } catch (e) {}
 
   return {
     'r': r,
@@ -363,12 +400,13 @@ var QTHUpdater = function(r){
   }
   Tracker.autorun(function(){
     var updates = QTH.find({'t': {$gt: stamp}},{$sort:{'t':1}}).fetch();
-    var myCall = $('#myCall').val();
     var myColor = 'aqua';
     stamp = +new Date();
     for(var i=0,l=updates.length; i<l; ++i) (function(i){
-      var cx = updates[i].qthxy.cx;
-      var cy = updates[i].qthxy.cy;
+      var location = HamGridSquare.toLatLon(updates[i].grid);
+      var coords = app.world.getXY(location._lat, location._lon );
+      var cx = coords.cx;
+      var cy = coords.cy;
       var t = updates[i].t;
       var call = updates[i].call;
       var color = 0;
@@ -410,7 +448,6 @@ satPos = function(sat){
   } else { 
     pos[1] = -179.99;  // just stick it on the eastern edge for now
   }
-
   return pos; // returns a 2 element array lat, -long
 };
 

@@ -51,14 +51,15 @@ latLonToGridSquare = function(param1,param2){
   if (Math.abs(lon) > 180) throw "invalid longitude: "+lon;
   adjLat = lat + 90;
   adjLon = lon + 180;
-  GLat = U[Math.trunc(adjLat/10)];
-  GLon = U[Math.trunc(adjLon/20)];
-  nLat = ''+Math.trunc(adjLat % 10);
-  nLon = ''+Math.trunc((adjLon/2) % 10);
-  rLat = (adjLat - Math.trunc(adjLat)) * 60;
-  rLon = (adjLon - 2*Math.trunc(adjLon/2)) *60;
-  gLat = L[Math.trunc(rLat/2.5)];
-  gLon = L[Math.trunc(rLon/5)];
+  // use Math.floor as it is in both browser and nodeJS whereas Math.trunc is not in nodeJS Jan-2015 PJB
+  GLat = U[Math.floor(adjLat/10)];
+  GLon = U[Math.floor(adjLon/20)];
+  nLat = ''+Math.floor(adjLat % 10);
+  nLon = ''+Math.floor((adjLon/2) % 10);
+  rLat = (adjLat - Math.floor(adjLat)) * 60;
+  rLon = (adjLon - 2*Math.floor(adjLon/2)) *60;
+  gLat = L[Math.floor(rLat/2.5)];
+  gLon = L[Math.floor(rLon/5)];
   return GLon+GLat+nLon+nLat+gLon+gLat;
 }
 

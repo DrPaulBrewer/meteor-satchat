@@ -7,6 +7,25 @@ Meteor.startup(function(){
   Lids = new Mongo.Collection("lids");
   Nologins = new Mongo.Collection("nologins");
 
+  // fix legacy world map coords QTH
+  var fixQTH = function(){
+    var data = QTH.find({'qthxy': {$exists: true}}).fetch();
+    var i=0,l=data.length;
+    for(;i<l;++i){
+      (function(x){
+        var lat,lon,grid;
+        lat = (x.qthxy.cy - 150.0) * (-90.0/150.0);
+        lon = (x.qthxy.cx - 300.0) * (180.0/300.0);
+        grid = HamGridSquare.fromLatLon(lat,lon);
+        QTH.remove({'call': x.call});        
+        QTH.insert({'call': x.call, 'grid': grid, 't': x.t});
+        console.log('fixed: '+x.call+' grid:'+grid);
+      })(data[i]);
+    }
+  };
+  
+  fixQTH(); 
+  
   Meteor.publish("messages", function(){
     return Messages.find();
   });
@@ -79,23 +98,34 @@ Meteor.startup(function(){
     return ( (attempt.user) && (!isNoLogin(attempt.user.username)) );
   });
   
+  getGrid = function(mycall){
+    var grid;
+    try {
+      grid = QTH.findOne({'call':mycall}).grid;
+    } catch(e){};
+    return grid;
+  }
+  
   Meteor.methods({
-    'chatRegister': function(mycall, qthxy){
+    'chatRegister': function(mycall, newGrid){
+      var oldGrid = getGrid(mycall);
+      var grid = newGrid || oldGrid;
+      console.log("in catRegister: "+mycall+" "+oldGrid+" "+newGrid);
       if (typeof(mycall)==="string" && (mycall.length>0)){
         try { 
           mycall = mycall.toUpperCase();
-          if (mycall === Meteor.user().username){
-            if (qthxy && qthxy.cx && qthxy.cy){
-              qthxy.cx = Math.round(qthxy.cx);
-              qthxy.cy = Math.round(qthxy.cy);
-              QTH.remove({'call': mycall});          
-              QTH.insert({'call': mycall, 'qthxy': qthxy, 't': +new Date()});
+          if (mycall === Meteor.user().username){          
+            if ( grid && (/^[A-Z][A-Z][0-9][0-9]/.test(grid)) && (grid.length<=6)){         
+              QTH.remove({'call': mycall}); 
+              QTH.insert({'call': mycall, 'grid': grid, 't': +new Date()});
+              console.log("chatRegister: "+mycall+" "+grid);
+              return true;
             }
           }
         } catch(e){ console.log("in chatregister, error:"+JSON.stringify(e));
                   }
       }
-      return true;
+      return false;
     },
     'sendMessage': function(msg){
       var t = +new Date();

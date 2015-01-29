@@ -10,7 +10,7 @@
    </div>
    <div id="dialog-grid" class="initiallyHidden" title="Whats your grid square?">
      <p>
-       <span class="orange">Plase set your grid square in the QTH tab for local satellite calculations and the login map</span>
+       <span class="orange">Please set your grid square in the QTH tab for local satellite calculations and the login map</span>
      </p>
    </div>
    <div id="chatTop">
@@ -81,10 +81,19 @@
        <textarea id="ignore"></textarea>
      </div>
      <div id="qth" class="vscroll">
-       <p><label for="myGrid">Your Grid QTH:  </label>
-       <input type="text" name="myGrid" id="myGrid" size="6" />
-       <button id="updateMyGrid">Update</button>
+       <p>Three ways to update QTH, choose one: </p>
+       <p><button id="updateQTHviaBrowser">Use web geolocation</button></p>
+       <p><label for="myGrid">Grid Square:  </label>
+       <input type="text" name="myGrid" id="myGrid" class="myGrid" size="6" />
+       <button id="updateMyGrid">Update Grid</button>
        </p>
+       <p><label for="myLat">Lat:</label>
+         <input type="number" min="-90" max="90" step="0.0001" name="myLat" id="myLat" class="myLat" />
+         <label for="myLon">Lon:</label>
+         <input type="number" min="-180" max="180" step="0.0001" name="myLon" id="myLon" class="myLon" />
+         <button id="updateMyLatLon">Update Lat/Lon</button>
+       </p>
+       <hr/>
        {{ >qthTable }}
      </div>
      <div id="passes" class="vscroll">

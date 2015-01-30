@@ -25,7 +25,7 @@
      <span id="timeUTC"></span>
      {{#if currentUser}}
        {{#with nextSat}}
-     <em id="nextSat">next {{ name }}: {{hms dateTimeStart}} @ {{riseAzimuth}}°</em>
+     <em id="nextSat">next {{ name }}: {{utcHM dateTimeStart}} @ {{riseAzimuth}}°</em>
        {{/with}}
      {{else}}
        <span id="register">

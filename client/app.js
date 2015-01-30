@@ -1,19 +1,10 @@
 // satchat Copyright 2014, 2015
 // Paul Brewer KI6CQ - Economic and Financial Technology Consulting LLC - www.eaftc.com
 //
-// <your name could be here too> if you contribute code features or patches we use
-//
 // Open Source License: MIT License -- see http://opensource.org/licenses/MIT
 // 
 // satchat is a MeteorJS based chat room that also displays satellite tracking data
 //
-// The chats and about 24hrs of 1 minute satellite tracking data are kept in a MongoDB database
-// Calculations for tracking must be supplied to the database externally
-//
-// This file: world.js began as a modification of Baranovskiy's demo used on the Raphael js library website
-// As of Nov.8, most of the demo code is gone and this is mostly sat display code
-// Paul Brewer 8 Nov 2014 
-// 
 //
 
 var _depSat = new Deps.Dependency();
@@ -75,14 +66,19 @@ satmag = 1.0;
   
 Session.set('ignore',[]);
 
-var utcHMS = function(t){
-  d = new Date(t);
-  day = d.getUTCDate(t);
-  h = d.getUTCHours();
-  m = d.getUTCMinutes();
+var utcHM = function(t){
+  var d = new Date(t);
+  var h = d.getUTCHours(t);
+  var m = d.getUTCMinutes(t);
   if (h<10) h='0'+h;
   if (m<10) m='0'+m;
-  return day+' '+h+':'+m;
+  return h+':'+m;  
+};
+
+var utcDHM = function(t){
+  var d = new Date(t);
+  var day = d.getUTCDate(t);
+  return day+' '+utcHM(t);
 };
 
 
@@ -226,7 +222,8 @@ registerHelpers({
   checkedIn: function(){
     return checkedIn();
   },
-  hms: utcHMS,
+  utcDHM: utcDHM,
+  utcHM: utcHM,
   qths: function(){
     return QTH.find({},{sort: {"call": 1}}).fetch();
   },
@@ -469,42 +466,34 @@ var QTHUpdater = function(r){
   });
 };
 
-
-satPos = function(sat){
-  var s;
-  try {
-    s = PLib.QuickFind(sat);
-  } catch(e){ console.log("in satPos: "+sat+" error: "+e); }
-  return new LatLon(s.latitude, s.longitude);
-};
-
 Meteor.startup(function(){
   $('.signinEnabled').prop('disabled',true);
   $('.initiallyHidden').hide();
   app = makeWorld();
-  satPosXY = function(sat){
-    var pos = satPos(sat);
-    return app.world.getXY(pos._lat, pos._lon); // 
-    // returns an object with cx, cy attributes, ready to use in RaphaelJS circle.attr() function
-  }
   drawISS = function(){
+    var txt2;
     app.r.setStart();
     app.r.rect(-12,-10,3,20).attr("fill","#ff0");
     app.r.rect(12,-10,3,20).attr("fill","#00f");
     app.r.rect(-7,-5,14,10).attr("fill","#000");
     app.r.text(1,0,"ISS").attr("fill","#bbb");
+    txt2 = app.r.text(1,18,"").attr("fill","#ee3");
+    txt2.node.id='satInfoISS';
     return app.r.setFinish();
   };
   drawSat = function(name, color){
-    var mag = 100;
+    var mag = 100; 
+    var txt1, txt2;
     app.r.setStart();
     app.r.circle(0,0,5).attr("fill", color);
     app.r.rect(-15,5,30,10).attr("fill","#000");
-    app.r.text(0,10,name).attr("fill", color);
+    txt1 = app.r.text(0,10,name).attr("fill", color);
+    txt2 = app.r.text(0,20,'').attr("fill", color);
+    txt2.node.id = 'satInfo'+name;
     return app.r.setFinish().transform("s1.5");
   };
   satAnimation = function(){
-    var fills = ['#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fff','#800','#080','#008'];
+    var fills = ['#f00','#0f0','#88f','#ff0','#f0f','#0ff','#fff','#d00','#0d0','#80d'];
     app.balls = [];
     var balls = app.balls;
     var coords;
@@ -516,11 +505,23 @@ Meteor.startup(function(){
       }
     }
     var animationStep = function(){
-      for(i=0,l=sats.length;i<l;++i){
-        var coords = satPosXY(sats[i]);
-        balls[i].transform("S"+satmag+"T"+coords.cx+","+coords.cy);
-      }
-    }
+      var satInfo, coords, txt;
+      for(var i=0,l=sats.length;i<l;++i){ 
+        try {
+          satInfo = PLib.QuickFind(sats[i]);
+          coords = app.world.getXY(satInfo.latitude, satInfo.longitude);
+          balls[i].transform("S"+satmag+"T"+coords.cx+","+coords.cy);
+          if (myGrid && (satInfo.elevation>0)){
+            txt = '@'+Math.round(satInfo.azimuth)+'° ∠'+Math.round(satInfo.elevation)+'°';
+          } else {
+            txt = '';
+          }
+          $('#satInfo'+sats[i]).text(txt);
+        } catch(e){
+          console.log("error in animationStep: "+e);
+        }
+      }      
+    };
     setInterval(animationStep, 1000);
   }
   UTC = function(){

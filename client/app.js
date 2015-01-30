@@ -94,7 +94,7 @@ whoIs = function(uid){
 
 myCall = '';
 myGrid = '';
-myLatLon = new LatLon(0,0);
+myLatLon = null;
 
 Tracker.autorun(function(){
   myCall = Session.get('callsign');
@@ -178,6 +178,22 @@ var registerHelpers = function(obj){
   }
 };
 
+var byDateTimeStart = function(a,b){ 
+  return a.dateTimeStart-b.dateTimeStart;
+};
+
+var nextSat = function(){
+  var listOfPasses;
+  var now = +(new Date());
+  if (!myLatLon) return null;
+  listOfPasses = PLib.getTodaysPasses().filter(
+    function(p){
+      return (p && p.dateTimeStart && (p.dateTimeStart>now));
+    });
+  listOfPasses.sort(byDateTimeStart);
+  return listOfPasses[0];
+};
+
 registerHelpers({
   screenHeight: function(){
     return sceeen.height;
@@ -225,16 +241,25 @@ registerHelpers({
       if ((grid) && (myLatLon)) return Math.round(myLatLon.distanceTo(HamGridSquare.toLatLon(grid)));
     } catch(e){ console.log("in distanceToGrid "+grid+" error:"+e); };
     return '';
+  },
+  'nextSat': function(){ 
+    _depSat.depend();
+    try {
+      var s = nextSat();
+      var delay = (+s.dateTimeStart)-(+new Date());
+      if (delay>0) setTimeout(function(){ _depSat.changed(); }, delay);
+      return s;
+    } catch(e) { console.log("error in nextSat helper:"+e); }
   }
 });
 
 Template.passTable.helpers({
   passes: function(){
-    var listOfPasses = PLib.getTodaysPasses();
-    listOfPasses.sort(function(a,b){
-      return a.dateTimeStart-b.dateTimeStart;
-    });
-    _depSat.depend();
+    var listOfPasses;
+    _depSat.depend();  
+    if (!myLatLon) return null;
+    listOfPasses = PLib.getTodaysPasses();
+    listOfPasses.sort(byDateTimeStart);
     // thanks  http://stackoverflow.com/a/18216255/103081 for how to define explicit dependencies
     return listOfPasses;
   }
@@ -377,7 +402,6 @@ makeWorld = function (){
     if (typeof(LatLon)==='function') return new LatLon(lat,lon);
     return {"lat": lat, "lon": lon}
   };
-
 
   return {
     'r': r,

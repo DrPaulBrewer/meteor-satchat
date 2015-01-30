@@ -24,6 +24,9 @@
      </span>
      <span id="timeUTC"></span>
      {{#if currentUser}}
+       {{#with nextSat}}
+     <em id="nextSat">next {{ name }}: {{hms dateTimeStart}} @ {{riseAzimuth}}°</em>
+       {{/with}}
      {{else}}
        <span id="register">
          call: <input type="text" id="callsign" size="12"/> 

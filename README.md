@@ -9,7 +9,9 @@ This app is written in the [Meteor Javascript framework](http://www.meteor.com)
 
 Contributions of code for features and patches are appreciated and will be mentioned in the CREDITS.
 
-This meteor-satchat github repository contains both the front end code and a custom Meteor package to bridge to a back end copy of KD2BD predict, a well-establised Linux text-based satellite prediction program by John A. Magliacane, KD2BD.
+Satellite prediction calculations are done in the browser, based on West's PredictLib, a rewrite of KB2BD's PREDICT from C into Javascript. 
+
+TLEs are updated automatically. The end user does not have to mess around with TLEs manually. 
 
 Want to help out? test your own copy?
 

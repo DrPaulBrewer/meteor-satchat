@@ -383,25 +383,27 @@ Template.msg.rendered = function(){
     scrollToEnd(chatDiv);
 };
 
-makeWorld = function (){
-  var r = Raphael(0, 0, 600, 300);
-  world = r.image("/nasa-world-dec.jpg",0,0,600,300);
+makeWorld = function (width, height){
+  var r = Raphael(0, 0, width, height);
+  world = r.image("/nasa-world-dec.jpg",0,0,width,height);
   world.getXY = function (lat, lon) {
     return {
-      cx: lon * (300.0/180.0) + 300.0,
-      cy: lat * (-150.0/90.0) + 150.0
+      cx: lon * (width/(2*180)) + (width/2),
+      cy: lat * (-height/(2*90)) + (height/2)
     };
   };
   world.getLatLon = function (x, y) {
     var lat,lon;
-    lat = (y - 150.0) * (-90.0/150.0);
-    lon = (x - 300.0) * (180.0/300.0);
+    lat = (y - (height/2)) * (-90.0/(height/2));
+    lon = (x - (width/2)) * (180.0/(width/2));
     if (typeof(LatLon)==='function') return new LatLon(lat,lon);
     return {"lat": lat, "lon": lon}
   };
 
   return {
     'r': r,
+    'height': height,
+    'width': width,
     'world': world
   }
 };
@@ -469,7 +471,7 @@ var QTHUpdater = function(r){
 Meteor.startup(function(){
   $('.signinEnabled').prop('disabled',true);
   $('.initiallyHidden').hide();
-  app = makeWorld();
+  app = makeWorld(600,300);
   drawISS = function(){
     var txt2;
     app.r.setStart();

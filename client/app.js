@@ -92,20 +92,6 @@ myCall = '';
 myGrid = '';
 myLatLon = null;
 
-Tracker.autorun(function(){
-  myCall = Session.get('callsign');
-  if (myCall){
-    try {
-      myGrid = QTH.findOne({'call':myCall}).grid;
-      myLatLon = HamGridSquare.toLatLon(myGrid);
-      $('.myGrid').val(myGrid);
-      $('.myLat').val(myLatLon._lat);
-      $('.myLon').val(myLatLon._lon);
-      PLib.configureGroundStation(myLatLon._lat, myLatLon._lon);
-      _depSat.changed();  
-    } catch(e){};
-  }
-});
 
 ignored = function(call){
   if (!Session.get('ignore')) return false;
@@ -270,7 +256,6 @@ Template.app.events({
     if (confirm("thanks 73 was good qso - GO QRT?")){
         Meteor.logout();
         $('.signinEnabled').prop('disabled', true);
-        Session.set('callsign','');
     }
   },
   'click .signin': function(event, template){
@@ -278,7 +263,6 @@ Template.app.events({
       if ((typeof(callsign)==="string") && (callsign.length>2)){
         callsign = callsign.toUpperCase();
         $('#callsign').val(callsign);
-        Session.set('callsign',callsign);
         var pass = $('#pass').val();
         var onGoodPassword = function(){
             console.log('good password');
@@ -531,16 +515,34 @@ Meteor.startup(function(){
   };
   UTC();
   setInterval(UTC, 1000);  
-  setTimeout(function(){
-    if (Meteor.userId()){
-      console.log(Meteor.userId());
-      console.log("recognized as:"+whoIs(Meteor.userId()));
-      $(".signinEnabled").prop("disabled",false);
-    }
-  }, 2000);
+  
   
   setTimeout(QTHUpdater.bind({}, app.r), 3000);
 
   setTimeout(satAnimation, 4000);   
+  
+  Tracker.autorun(function(){
+    var myQTH;
+    var myUser = Meteor.user();
+    myCall = (myUser)? myUser.username: null; 
+    if (myCall){
+      try {
+        $(".signinEnabled").prop("disabled",false);       
+        myQTH = QTH.findOne({'call':myCall});
+        console.log(myQTH);
+        if (myQTH && myQTH.grid){
+          myGrid = myQTH.grid; 
+          myLatLon = HamGridSquare.toLatLon(myGrid);
+          $('.myGrid').val(myGrid);
+          $('.myLat').val(myLatLon._lat);
+          $('.myLon').val(myLatLon._lon);
+          PLib.configureGroundStation(myLatLon._lat, myLatLon._lon);
+          _depSat.changed();  
+        }
+      } catch(e){ console.log("in QTH setup, error:"+e); };
+    }
+  });
+
+  
 });
 

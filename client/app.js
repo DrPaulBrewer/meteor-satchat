@@ -164,13 +164,16 @@ var byDateTimeStart = function(a,b){
   return a.dateTimeStart-b.dateTimeStart;
 };
 
-var nextSat = function(){
+nextSat = function(satName){
+  // empty satName will match any next satellite
   var listOfPasses;
   var now = +(new Date());
   if (!myLatLon) return null;
   listOfPasses = PLib.getTodaysPasses().filter(
     function(p){
-      return (p && p.dateTimeStart && (p.dateTimeStart>now));
+      return (p && p.dateTimeStart && (p.dateTimeStart>now) && 
+              ((!satName) || (p.name === satName))
+             );
     });
   listOfPasses.sort(byDateTimeStart);
   return listOfPasses[0];

@@ -1,7 +1,7 @@
 Package.describe({
   name: 'drpaulbrewer:sat-tle',
-  summary: ' fetch NORAD two line elements needed for satellite predictions ',
-  version: '0.1.0',
+  summary: ' fetch two line elements needed for satellite predictions ',
+  version: '0.1.1',
   git: ' /* Fill me in! */ '
 });
 

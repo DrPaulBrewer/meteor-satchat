@@ -84,8 +84,8 @@ var utcDHM = function(t){
 
 whoIs = function(uid){
   var found =  Meteor.users.findOne(uid);
-  if (found) found = found.username;
-  return found;
+  if (found) return found.username;
+  // otherwise return undefined
 };
 
 myCall = '';

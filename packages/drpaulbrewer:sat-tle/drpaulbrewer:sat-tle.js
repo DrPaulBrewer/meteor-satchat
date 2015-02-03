@@ -17,7 +17,7 @@ var updateTLE = function(){
       if (((i%3) === 0) && (lines[i].length<1)) done=1;
       if (!done){ 
         if ((i%3)===0){
-          result.push([lines[i].trim()]);
+          result[Math.floor(i/3)] = [lines[i].trim()];
         } else {
           result[Math.floor(i/3)].push(lines[i].trim());
         }

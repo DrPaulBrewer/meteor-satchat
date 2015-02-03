@@ -108,7 +108,7 @@ Meteor.startup(function(){
     'chatRegister': function(mycall, newGrid){
       var oldGrid = getGrid(mycall);
       var grid = newGrid || oldGrid;
-      console.log("in catRegister: "+mycall+" "+oldGrid+" "+newGrid);
+      console.log("in chatRegister: "+mycall+" "+oldGrid+" "+newGrid);
       if (typeof(mycall)==="string" && (mycall.length>0)){
         try { 
           mycall = mycall.toUpperCase();

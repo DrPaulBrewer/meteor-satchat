@@ -3,7 +3,8 @@ TLE.remove({}, function(e){ if(e) console.log("TLE.remove:"+e); });
 
 var urls = [
   'http://www.celestrak.com/NORAD/elements/amateur.txt',
-  'http://www.celestrak.com/NORAD/elements/weather.txt'
+  'http://www.celestrak.com/NORAD/elements/weather.txt',
+  'http://www.celestrak.com/NORAD/elements/tle-new.txt'
   ];
 
 var updateTLE = function(){

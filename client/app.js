@@ -486,7 +486,7 @@ Meteor.startup(function(){
     return app.r.setFinish().transform("s1.5");
   };
   satAnimation = function(){
-    var fills = ['#f00','#0f0','#88f','#ff0','#f0f','#0ff','#fff','#d00','#0d0','#80d'];
+    var fills = ['#f00','#0f0','#88f','#ff0','#f0f','#0ff','#fff','#d00','#0d0','#80d','#aaa','#a00','#0a0','#00a','#aa0','#0aa'];
     app.balls = [];
     var balls = app.balls;
     var coords;

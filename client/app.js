@@ -19,7 +19,6 @@ var satWanted = [['(AO-7)','AO7'],
                  ["ISS", "ISS"],
                  ['XW-2A','XW2A'],
                  ['XW-2C','XW2C'],
-                 ['XW-2D','XW2D'],
                  ['XW-2E','XW2E'],
                  ['XW-2F','XW2F']
             ];

@@ -3,6 +3,8 @@ meteor-satchat
 
 Meteor chat room app for ham radio satellite enthusiasts.
 
+May be online intermittently [here](http://159.65.111.7:3000)
+
 Beta version provides basic chat room and satellite location display.
 
 This app is written in an early version of the  [Meteor Javascript framework](http://www.meteor.com)

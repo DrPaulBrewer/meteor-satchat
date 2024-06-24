@@ -7,7 +7,8 @@ Chat room app for ham radio satellite enthusiasts.
 
 May be online intermittently [here](http://159.65.111.7:3000)
 
-UPDATE 2024:  This is an old project from many years ago.  I'm really
+UPDATE 2024:  This is an old project from many years ago that I managed
+to (barely) get running again in June 2024.  I'm really
 not sure if the ham radio world really needed an internet chat room
 that tracks ham radio satellites (wouldn't you rather be talking on those
 than texting?).

@@ -1,6 +1,8 @@
 meteor-satchat
 ==============
 
+![screenshot of meteor-satchat PASSES tab](./screenshots/Passes-20240624.png)
+
 Meteor chat room app for ham radio satellite enthusiasts.
 
 May be online intermittently [here](http://159.65.111.7:3000)

@@ -33,8 +33,12 @@ to run the `docker build` and `docker run` steps again.
 ```
 git clone https://github.com/drpaulbrewer/meteor-satchat
 cd meteor-satchat
-docker build -t satchat .
-docker run -it satchat
+docker build --no-cache -t satchat .
+docker run -d -p 127.0.0.1:3000:3000 --restart unless-stopped satchat
+# -d run in the background, not interactive
+# -p address:port:port  maps address:port on host to port on container
+# --restart unless-stopped  restarts the docker container if it crashes, unless manually stopped
+
 ```
 
 

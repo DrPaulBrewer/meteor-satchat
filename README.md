@@ -5,7 +5,9 @@ meteor-satchat
 
 Chat room app for ham radio satellite enthusiasts.
 
-May be online intermittently [here](http://159.65.111.7:3000) [status page](https://drpaulbrewer.github.io/meteor-satchat-demo-uptime)
+May be online intermittently [here](http://159.65.111.7:3000) 
+
+There's also a [status page](https://drpaulbrewer.github.io/meteor-satchat-demo-uptime)
 
 UPDATE 2024:  This is an old project from many years ago that I managed
 to (barely) get running again in June 2024.  I'm really

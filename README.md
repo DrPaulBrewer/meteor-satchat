@@ -11,10 +11,14 @@ A [satchat demo website](http://159.65.111.7:3000) may be online.
 There's also a [status page](https://drpaulbrewer.github.io/meteor-satchat-demo-uptime) tracking the demo's uptime.
 
 UPDATE 2024:  This is an old project from many years ago that I managed
-to (barely) get running again in June 2024.  I'm really
-not sure if the ham radio world really needed an internet chat room
+to (barely) get running again in June 2024.  It runs in dev-mode with `meteor run` and will create 
+a production bundle with `meteor build --server-only --directory ../build` (NODE TLS/SSL checking off in both cases because
+the old meteor repos have expired certificates). However, 
+subsequent installation of the production bundle with `npm install` fails. 
+
+I'm not sure if the ham radio world really needed an internet chat room
 that tracks ham radio satellites (wouldn't you rather be talking on those
-than texting?).
+satellites than texting about them?). But... it could still have niche uses.  
 
 Beta version provides basic chat room and satellite location display.
 

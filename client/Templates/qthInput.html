@@ -1,0 +1,18 @@
+<template name="qthInput">
+    <p>Multiple ways to update QTH, choose one: </p>
+    {{#if https}}
+    <p><button id="updateQTHviaBrowser">Use web geolocation</button></p>
+    {{else}}
+    <p>Manual input only (consider https server)</p>
+    {{/if}}
+    <p><label for="myGrid">Grid Square:  </label>
+        <input type="text" name="myGrid" id="myGrid" class="myGrid" size="6" />
+        <button id="updateMyGrid">Update Grid</button>
+    </p>
+    <p><label for="myLat">Lat:</label>
+        <input type="number" min="-90" max="90" step="0.0001" name="myLat" id="myLat" class="myLat" />
+        <label for="myLon">Lon:</label>
+        <input type="number" min="-180" max="180" step="0.0001" name="myLon" id="myLon" class="myLon" />
+        <button id="updateMyLatLon">Update Lat/Lon</button>
+    </p>
+</template>

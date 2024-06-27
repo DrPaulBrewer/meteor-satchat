@@ -1,7 +1,9 @@
 <template name="qthInput">
-    <p>Three ways to update QTH, choose one: </p>
+    <p>Multiple ways to update QTH, choose one: </p>
     {{#if https}}
     <p><button id="updateQTHviaBrowser">Use web geolocation</button></p>
+    {{else}}
+    <p>Manual input only (consider https server)</p>
     {{/if}}
     <p><label for="myGrid">Grid Square:  </label>
         <input type="text" name="myGrid" id="myGrid" class="myGrid" size="6" />

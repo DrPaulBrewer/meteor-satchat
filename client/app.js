@@ -184,62 +184,77 @@ nextSat = function(satName){
 };
 
 registerHelpers({
-  screenHeight: function(){
-    return sceeen.height;
-  },
-  screenWidth: function(){
-    return screen.width;
-  },
-  windowHeight: function(){
-    return $(window).height();
-  },
-  windowWidth: function(){
-    return $(window).width();
-  },
-  msgs: function(){ 
-    var query = {call: {$nin: Session.get('ignore')}};
-    return Messages.find(query);
-  },
-  announcements: function(){
-    var query = {$and: [{call: {$nin: Session.get('ignore')}},
-                        {t: {$gt: (+new Date() - 2*86400000)}},
-                                 {txt: {$in: [/^!/]}}
-                                ]};
-    var msgs =  Messages.find(query);
+  "announcements": function () {
+    var query = {
+      "$and": [{"call": {"$nin": Session.get('ignore')}},
+        {"t": {"$gt": (+new Date() - 2 * 86400000)}},
+        {"txt": {"$in": [/^!/]}}
+      ]
+    };
+    var msgs = Messages.find(query);
     return lastMessages(msgs, orderBy('call'));
   },
-  lastTransmission: function(){
-    var query = {call: {$nin: Session.get('ignore')}};
-    return lastMessages(Messages.find(query), orderBy('time', -1));
-  },
-  checkedIn: function(){
-    return checkedIn();
-  },
-  utcDHM: utcDHM,
-  utcHM: utcHM,
-  qths: function(){
-    return QTH.find({},{sort: {"call": 1}}).fetch();
-  },
-  bearingToGrid: function(grid){
+  "bearingToGrid": function (grid) {
     try {
       if ((grid) && (myLatLon)) return Math.round(myLatLon.bearingTo(HamGridSquare.toLatLon(grid)));
-    } catch(e){ console.log("in bearingToGrid "+grid+" error:"+e); };
+    } catch (e) {
+      console.log("in bearingToGrid " + grid + " error:" + e);
+    }
+    ;
     return '';
   },
-  distanceToGrid: function(grid){
+  "checkedIn": function () {
+    return checkedIn();
+  },
+  "distanceToGrid": function (grid) {
     try {
       if ((grid) && (myLatLon)) return Math.round(myLatLon.distanceTo(HamGridSquare.toLatLon(grid)));
-    } catch(e){ console.log("in distanceToGrid "+grid+" error:"+e); };
+    } catch (e) {
+      console.log("in distanceToGrid " + grid + " error:" + e);
+    }
+    ;
     return '';
   },
-  'nextSat': function(){ 
+  "https": function() {
+    return (window.location.protocol === 'https:');
+  },
+  "lastTransmission": function () {
+    var query = {"call": {"$nin": Session.get('ignore')}};
+    return lastMessages(Messages.find(query), orderBy('time', -1));
+  },
+  "msgs": function () {
+    var query = {"call": {"$nin": Session.get('ignore')}};
+    return Messages.find(query);
+  },
+  'nextSat': function () {
     _depSat.depend();
     try {
       var s = nextSat();
-      var delay = (+s.dateTimeStart)-(+new Date());
-      if (delay>0) setTimeout(function(){ _depSat.changed(); }, delay);
+      var delay = (+s.dateTimeStart) - (+new Date());
+      if (delay > 0) setTimeout(function () {
+        _depSat.changed();
+      }, delay);
       return s;
-    } catch(e) { console.log("error in nextSat helper:"+e); }
+    } catch (e) {
+      console.log("error in nextSat helper:" + e);
+    }
+  },
+  "qths": function () {
+    return QTH.find({}, {"sort": {"call": 1}}).fetch();
+  },
+  "screenHeight": function () {
+    return sceeen.height;
+  },
+  "screenWidth": function () {
+    return screen.width;
+  },
+  "utcDHM": utcDHM,
+  "utcHM": utcHM,
+  "windowHeight": function () {
+    return $(window).height();
+  },
+  "windowWidth": function () {
+    return $(window).width();
   }
 });
 

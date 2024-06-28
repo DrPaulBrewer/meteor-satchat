@@ -9,7 +9,8 @@ Chat room app for ham radio satellite enthusiasts.
 The [satchat demo website](https://satchat.cq.cyou) may be online.  It is running in a $5/mo Digital Ocean
 droplet, together with a mongodb database and caddy2 https server with free, automated SSL certificates.  SSL
 is required to be able to use the web geolocation API, which is an option for users to easily input their QTH when
-they don't know their lat/lon or grid square.
+they don't know their lat/lon or grid square.  You can also run the software (for free) from your own server using the
+docker instructions below.  
  
 There's also a [status page](https://drpaulbrewer.github.io/meteor-satchat-demo-uptime) tracking the demo's uptime.
 

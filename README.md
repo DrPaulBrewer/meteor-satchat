@@ -6,15 +6,21 @@ meteor-satchat
 Chat room app for ham radio satellite enthusiasts.
 
 
-A [satchat demo website](http://159.65.111.7:3000) may be online. 
+The [satchat demo website](https://satchat.cq.cyou) may be online.  It is running in a $5/mo Digital Ocean
+droplet, together with a mongodb database and caddy2 https server with free, automated SSL certificates.  SSL
+is required to be able to use the web geolocation API, which is an option for users to easily input their QTH when
+they don't know their lat/lon or grid square.
  
 There's also a [status page](https://drpaulbrewer.github.io/meteor-satchat-demo-uptime) tracking the demo's uptime.
 
 UPDATE 2024:  This is an old project from many years ago that I managed
 to (barely) get running again in June 2024.  It runs in dev-mode with `meteor run` and will create 
-a production bundle with `meteor build --server-only --directory ../build` (NODE TLS/SSL checking off in both cases because
-the old meteor repos have expired certificates). However, 
-subsequent installation of the production bundle with `npm install` fails. 
+a production bundle with `meteor build --server-only --directory ../build`.  In each case it was necesaary
+to turn off NODE TLS/SSL checking -- which is insecure -- because
+the old meteor repository servers have expired certificates.  One has to wonder how long those servers
+will be around.  Additionally, the  
+subsequent installation of the production bundle with `npm install` fails with various compile-time errors
+for some npm meteor depedencies that no longer build correctly.
 
 I'm not sure if the ham radio world really needed an internet chat room
 that tracks ham radio satellites (wouldn't you rather be talking on those

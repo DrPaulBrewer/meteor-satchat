@@ -1,9 +1,10 @@
 FROM meteor/meteor-base:20211013T200759Z_489f5fe
-MAINTAINER drpaulbrewer@gmail.com
+#FROM meteor/galaxy-app:20231124T140452T_44afh58
 EXPOSE 3000
 USER root
-RUN apt-get update && apt-get --yes install apt-utils locales && locale-gen en_US.UTF-8
+RUN apt-get update && apt-get --yes upgrade && apt-get --yes install apt-utils locales less nano ubuntu-release-upgrader-core && locale-gen en_US.UTF-8 && do-release-upgrade -f DistUpgradeViewNonInteractive
 USER mt
+#
 # CHOOSE ONLY ONE TYPE OF INSTALLATION
 #
 # For installation from remote github
@@ -14,11 +15,13 @@ USER mt
 
 # For installation from local files
 # uncomment the next line
-COPY --chown=mt:mt . /home/mt/meteor-satchat
+# COPY --chown=mt:mt . /home/mt/meteor-satchat
 # end local files installation
+
+# For linking to local files
+# simply add -v /path/to/meteor-satchat:/home/mt/meteor-satchat to docker run
+# and leave 
 
 WORKDIR /home/mt/meteor-satchat
 ENV LC_ALL=en_US.UTF-8
-# Issue: Old Meteor is Legacy software.  Some of Meteor repos TLS certs have expired.  
-# The work around is to disable TLS security and NODE_TLS_REJECT_UNAUTHORIZED=0 allows it but is insecure.
-CMD NODE_TLS_REJECT_UNAUTHORIZED=0 meteor run
+CMD meteor run

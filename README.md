@@ -6,7 +6,7 @@ Chat room app for ham radio satellite enthusiasts.
 
 ## demo
 
-The [satchat demo website](https://satchat.cq.cyou) may be online.  It is running in a $5/mo Digital Ocean
+The [satchat demo website](https://satchat.cq.cyou) should be online for experimentation.  It is running in a $5/mo Digital Ocean
 droplet, together with a mongodb database and caddy2 https server with free, automated SSL certificates.  SSL
 is a pre-requisite for the web geolocation API, which is an option for users to easily input their QTH when
 they don't know their lat/lon or grid square.  You can also run the software (for free) from your own server using the
@@ -15,13 +15,8 @@ docker instructions below.
 There's also a [status page](https://drpaulbrewer.github.io/meteor-satchat-demo-uptime) tracking the demo's uptime.
 
 UPDATE 2024:  This is an old project from many years ago that I managed
-to (barely) get running again in June 2024.  It runs in dev-mode with `meteor run` and will create 
-a production bundle with `meteor build --server-only --directory ../build`.  In each case it was necesaary
-to turn off NODE TLS/SSL checking -- which is insecure -- because
-the old meteor repository servers have expired certificates.  One has to wonder how long those servers
-will be around.  Additionally, the  
-subsequent installation of the production bundle with `npm install` fails with various compile-time errors
-for some npm meteor depedencies that no longer build correctly.
+to get running again in June 2024.  It runs in dev-mode with `meteor run` and will create 
+an (untested) production bundle with `meteor build --server-only --directory ../build`.  
 
 I'm not sure if the ham radio world really needed an internet chat room
 that tracks ham radio satellites (wouldn't you rather be talking on those
@@ -31,7 +26,9 @@ satellites than texting about them?). But... it could still have niche uses.
 
 Beta version provides basic chat room and satellite location display.
 
-This app is written in an early version of the  [Meteor Javascript framework](http://www.meteor.com)
+This app is written in an early version of the  [Meteor Javascript framework](http://www.meteor.com).  The Meteor libraries
+have been update to 2.x but the existing code has not been thoroughly tested.  It seems to work, but there might be features
+that don't work.
 
 Contributions of code for features and patches are appreciated and will be mentioned in the CREDITS.
 
@@ -69,12 +66,10 @@ You need:
 * docker and docker compose installed
 * an "A" DNS record pointed at your server/vm IP address.  (This may involve a control panel at your Domain Name Registrar, such as GoDaddy or Namecheap) 
 
-Caveats for "production" installation:
+Caveats for installation:
 * Alas, you probably shouldn't use this software for anything important or permanent. 
-* The usual command for creating a production version (`meteor build`) does not work.  It fails in building certain internal Meteor dependencies.
-* Using `meteor run` to start satchat is currently unstable and insecure, because it relies on Meteor servers with expired SSL/TLS certificates
-* At some point these Meteor servers may be retired or removed by their maintainers, and it will not be possible to `meteor run satchat`
-* A solution could be to update the software for Meteor version 3, which in June 2024 is not yet out of *release-candidate* status.
+* The usual command for creating a production version (`meteor build`) appears to be working but has not been thoroughly tested.
+* The docker container currently uses `meteor run` to start satchat.  This is not secure and is intended for experimentation and additional development work.  
 
 Here is how I set up satchat on Digital Ocean for free automatic SSL with a domain name I own (satchat.cq.cqyou).
 
@@ -241,4 +236,4 @@ These ports should be open so that caddy2 can serve satchat to users over the we
 Previous version 0.5.0 uses the [John Magliacane's KD2BD Predict](http://www.qsl.net/kd2bd/predict.html) binary on the back end (License: GPL).  That binary for 64 bit Ubuntu and the source tarball are also included.
 
 Paul Brewer, KI6CQ, 20 Nov 2014
-Updated to add Dockerfile, 24 Jun 2024
+Updated to 2.x and docker, 24 Jun-July 2024

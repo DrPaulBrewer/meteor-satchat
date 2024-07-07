@@ -24,4 +24,5 @@ USER mt
 
 WORKDIR /home/mt/meteor-satchat
 ENV LC_ALL=en_US.UTF-8
+RUN meteor update --release METEOR@2.16
 CMD meteor run
